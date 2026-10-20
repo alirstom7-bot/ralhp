@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ الملكية - 1Win Style</title>
+    <title>عجلة الحظ الفاخرة - 1Win Style</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,12 +13,10 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            /* خلفية طراز 1Win: أزرق عميق مع تدرجات نيون فخمة */
             background: radial-gradient(circle at center, #0f2b46 0%, #061220 100%);
             color: #fff; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; padding: 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-
         .header { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .header-title { font-size: 18px; font-weight: 800; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.4); }
         .close-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
@@ -32,22 +30,19 @@
         .user-info { text-align: right; }
         .user-name { font-size: 14px; font-weight: bold; color: #fff; }
         .user-id { font-size: 11px; color: #7f9ebc; }
-        .user-balance { font-size: 12px; color: #00ffcc; font-weight: bold; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
 
         .wheel-section {
             position: relative; width: 320px; height: 320px; margin: 10px auto;
             display: flex; align-items: center; justify-content: center;
         }
-
         .pointer {
             position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent;
             border-top: 28px solid #00ffcc; z-index: 40; filter: drop-shadow(0 0 8px rgba(0,255,204,0.8));
         }
-
         #wheelWrapper {
             width: 300px; height: 300px; border-radius: 50%;
-            border: 8px solid #00ffcc; box-shadow: 0 0 30px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0,0,0,0.8);
+            border: 8px solid #00ffcc; box-shadow: 0 0 30px rgba(0, 255, 204, 0.4);
             overflow: hidden; position: relative; background: #061220;
         }
         #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; }
@@ -82,7 +77,6 @@
         <div class="user-info">
             <div class="user-name" id="userName">اللاعب</div>
             <div class="user-id">ID: <span id="tgId">0</span></div>
-            <div class="user-balance"><i class="fas fa-coins"></i> المحفظة: <span id="userBalance">0</span> NSP</div>
         </div>
         <div style="font-size: 30px; color: #00ffcc;"><i class="fas fa-gem"></i></div>
     </div>
@@ -97,22 +91,22 @@
 
     <div class="history-box">
         <div class="history-title">سجل النتيجة الفورية:</div>
-        <div class="history-list" id="historyList">جاهز للتدوير بناءً على رصيدك...</div>
+        <div class="history-list" id="historyList">جاهز للتدوير...</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let userId = tg.initDataUnsafe?.user?.id || "0";
-        let userName = tg.initDataUnsafe?.user?.first_name || "لاعب";
+        const urlParams = new URLSearchParams(window.location.search);
+        const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
+        const userId = urlParams.get('uid') || tg.initDataUnsafe?.user?.id || "0";
+        const userName = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : (tg.initDataUnsafe?.user?.first_name || "لاعب");
+
         document.getElementById('tgId').innerText = userId;
         document.getElementById('userName').innerText = userName;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
-
-        // استقبال الجوائز ديناميكياً من البوت عبر رابط الـ URL
+        // استقبال وتحديث القطاعات والجوائز ديناميكياً من البوت ولوحة الأدمن فوراً
         let sectors = [
             { text: "1000", color: "#0d243a", textColor: "#00ffcc" },
             { text: "2000", color: "#133152", textColor: "#fff" },
@@ -203,12 +197,17 @@
                     
                     if (!winningPrize.includes("حظ") && !winningPrize.includes("أوفر")) {
                         confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                        tg.showAlert(`🎉 مبروك! فزت بـ (${winningPrize})\nتمت إضافة الرصيد إلى محفظتك بنجاح.`);
+                        tg.showAlert(`🎉 مبروك! فزت بـ (${winningPrize})\nتمت إضافة الجائزة بنجاح.`);
                     } else {
                         tg.showAlert("حظ أوفراً في المرة القادمة!");
                     }
 
-                    document.getElementById('historyList').innerHTML = `✨ النتيجة: <b style="color:#00ffcc;">${winningPrize}</b>`;
+                    document.getElementById('historyList').innerHTML = `✨ النتيجة النهائية: <b style="color:#00ffcc;">${winningPrize}</b>`;
+                    
+                    // إرسال تنبيه أو إغلاق التطبيق بعد رؤية الفوز
+                    setTimeout(() => {
+                        tg.close();
+                    }, 4000);
                 }
             });
         }
