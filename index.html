@@ -91,7 +91,7 @@
 
     <div class="history-box">
         <div class="history-title">سجل النتيجة الفورية:</div>
-        <div class="history-list" id="historyList">جاهز للتدوير...</div>
+        <div class="history-list" id="historyList">اضغط على زر ابدأ للتدوير...</div>
     </div>
 
     <script>
@@ -100,31 +100,35 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
-        const userId = urlParams.get('uid') || tg.initDataUnsafe?.user?.id || "0";
-        const userName = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : (tg.initDataUnsafe?.user?.first_name || "لاعب");
+        const userId = urlParams.get('uid') || "0";
+        const userName = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : "لاعب";
+        const userDeposit = urlParams.get('dep') || "0";
 
         document.getElementById('tgId').innerText = userId;
         document.getElementById('userName').innerText = userName;
 
-        // استقبال وتحديث القطاعات والجوائز ديناميكياً من البوت ولوحة الأدمن فوراً
+        // استقبال الـ 7 خانات بالتسلسل المحدث من لوحة تحكم الأدمن
         let sectors = [
             { text: "1000", color: "#0d243a", textColor: "#00ffcc" },
             { text: "2000", color: "#133152", textColor: "#fff" },
             { text: "3000", color: "#0d243a", textColor: "#00ffcc" },
             { text: "5000", color: "#008866", textColor: "#fff" },
-            { text: "حظ أوفراً", color: "#1b2a47", textColor: "#ff5252" },
-            { text: "15% بونص", color: "#133152", textColor: "#00ffcc" }
+            { text: "15% بونص", color: "#1b2a47", textColor: "#ffd700" },
+            { text: "10% بونص", color: "#0d243a", textColor: "#00ffcc" },
+            { text: "حظ أوفراً", color: "#133152", textColor: "#ff5252" }
         ];
 
         if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
                 let prizesList = decodeURIComponent(prizesParam).split(',');
-                sectors = prizesList.map((prize, index) => ({
-                    text: prize.trim(),
-                    color: index % 2 === 0 ? "#0d243a" : "#133152",
-                    textColor: index % 3 === 0 ? "#00ffcc" : "#fff"
-                }));
+                if (prizesList.length >= 7) {
+                    sectors = prizesList.slice(0, 7).map((prize, index) => ({
+                        text: prize.trim(),
+                        color: index % 2 === 0 ? "#0d243a" : "#133152",
+                        textColor: index === 6 ? "#ff5252" : (index % 3 === 0 ? "#00ffcc" : "#fff")
+                    }));
+                }
             }
         }
 
@@ -162,8 +166,8 @@
                 ctx.rotate(angle + arc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = sector.textColor;
-                ctx.font = "bold 22px Tahoma";
-                ctx.fillText(sector.text, radius - 55, 8);
+                ctx.font = "bold 20px Tahoma";
+                ctx.fillText(sector.text, radius - 50, 7);
                 ctx.restore();
             });
         }
@@ -186,7 +190,7 @@
             const winningPrize = sectors[winningIndex].text;
             const degreesPerSector = 360 / sectors.length;
             const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
-            currentRotation = currentRotation + (360 * 7 - (currentRotation % 360)) + targetAngle;
+            currentRotation = currentRotation + (360 * 8 - (currentRotation % 360)) + targetAngle;
 
             gsap.to(wheelWrapper, {
                 rotation: currentRotation,
@@ -195,19 +199,19 @@
                 onComplete: () => {
                     isSpinning = false;
                     
-                    if (!winningPrize.includes("حظ") && !winningPrize.includes("أوفر")) {
+                    document.getElementById('historyList').innerHTML = `✨ النتيجة: <b style="color:#00ffcc;">${winningPrize}</b>`;
+
+                    if (!winningPrize.includes("حظ") && !winningPrize.includes("أوفر") && !winningPrize.includes("%")) {
                         confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                        tg.showAlert(`🎉 مبروك! فزت بـ (${winningPrize})\nتمت إضافة الجائزة بنجاح.`);
+                        tg.showAlert(`🎉 ألف مبروك! فزت بـ (${winningPrize})\nتمت إضافة الرصيد إلى محفظتك بنجاح.`);
                     } else {
-                        tg.showAlert("حظ أوفراً في المرة القادمة!");
+                        tg.showAlert(`نتيجتك: ${winningPrize}\nحظ أوفراً في المرة القادمة!`);
                     }
 
-                    document.getElementById('historyList').innerHTML = `✨ النتيجة النهائية: <b style="color:#00ffcc;">${winningPrize}</b>`;
-                    
-                    // إرسال تنبيه أو إغلاق التطبيق بعد رؤية الفوز
+                    // إرسال بيانات النتيجة للبنك أو إغلاق التطبيق بعد التوقف التام
                     setTimeout(() => {
                         tg.close();
-                    }, 4000);
+                    }, 3500);
                 }
             });
         }
