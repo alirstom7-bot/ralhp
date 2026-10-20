@@ -3,79 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ الفاخرة - 1Win</title>
+    <title>عجلة الحظ الفاخرة</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- مكتبة الحركة GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background: linear-gradient(135deg, #061220 0%, #0d243a 100%);
-            color: #fff; text-align: center; font-family: Tahoma, sans-serif;
-            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            background: #061220; color: #fff; text-align: center; font-family: Tahoma, sans-serif;
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-        .header { width: 100%; max-width: 360px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .header-title { font-size: 16px; font-weight: bold; color: #00ffcc; }
-        .close-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 15px; font-size: 11px; cursor: pointer; }
-
-        .user-card {
-            background: #0d243a; border: 1px solid rgba(0, 255, 204, 0.4); border-radius: 12px; padding: 8px 12px;
-            width: 100%; max-width: 360px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .user-name { font-size: 13px; font-weight: bold; color: #fff; text-align: right; }
-        .user-id { font-size: 10px; color: #7f9ebc; text-align: right; }
-
+        .header-title { font-size: 18px; font-weight: bold; color: #00ffcc; margin-bottom: 15px; }
+        
         .wheel-container {
-            position: relative; width: 310px; height: 310px; margin: 5px auto;
+            position: relative; width: 310px; height: 310px; margin: 20px auto;
             display: flex; align-items: center; justify-content: center;
         }
         .pointer {
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
-            border-top: 24px solid #00ffcc; z-index: 50; filter: drop-shadow(0 0 5px rgba(0,255,204,0.8));
+            border-top: 24px solid #00ffcc; z-index: 50;
         }
         #wheelWrapper {
             width: 290px; height: 290px; border-radius: 50%;
-            border: 6px solid #00ffcc; box-shadow: 0 0 25px rgba(0, 255, 204, 0.5);
-            position: relative; background: #061220; overflow: hidden;
+            border: 6px solid #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            position: relative; background: #0d243a; overflow: hidden;
         }
         #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; display: block; }
 
         .spin-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70px; height: 70px; background: linear-gradient(135deg, #00ffcc 0%, #008866 100%);
-            color: #030812; border: 3px solid #fff; border-radius: 50%; font-size: 15px;
+            width: 70px; height: 70px; background: #00ffcc; color: #030812;
+            border: 3px solid #fff; border-radius: 50%; font-size: 16px;
             font-weight: bold; cursor: pointer; z-index: 40; box-shadow: 0 0 15px rgba(0, 255, 204, 0.8);
             display: flex; align-items: center; justify-content: center;
         }
-        .spin-btn:active { transform: translate(-50%, -50%) scale(0.9); }
         .spin-btn.disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .result-box {
-            background: #0d243a; border: 1px solid rgba(0, 255, 204, 0.3);
-            border-radius: 10px; padding: 8px; width: 100%; max-width: 360px; margin-top: 12px;
-            font-size: 12px; color: #00ffcc; text-align: center;
-        }
+        .result-box { margin-top: 20px; font-size: 14px; color: #00ffcc; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <button class="close-btn" onclick="tg.close()">إغلاق</button>
-        <div class="header-title">عجلة الحظ الفاخرة</div>
-        <div></div>
-    </div>
-
-    <div class="user-card">
-        <div>
-            <div class="user-name" id="userName">اللاعب</div>
-            <div class="user-id">ID: <span id="tgId">0</span></div>
-        </div>
-        <div style="font-size: 24px; color: #00ffcc;"><i class="fas fa-dharmachakra"></i></div>
-    </div>
+    <div class="header-title">🎡 عجلة الحظ الفاخرة</div>
 
     <div class="wheel-container">
         <div class="pointer"></div>
@@ -85,21 +55,16 @@
         <button class="spin-btn" id="spinBtn" onclick="spinWheel()">ابدأ</button>
     </div>
 
-    <div class="result-box" id="resultText">اضغط على زر (ابدأ) لتدوير العجلة وحصد جائزتك</div>
+    <div class="result-box" id="resultText">اضغط على زر (ابدأ) لتدوير العجلة</div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        let tg = window.Telegram.WebApp;
+        try { tg.expand(); } catch(e) {}
 
         const urlParams = new URLSearchParams(window.location.search);
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
-        const userId = urlParams.get('uid') || "0";
-        const userName = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : "لاعب";
 
-        document.getElementById('tgId').innerText = userId;
-        document.getElementById('userName').innerText = userName;
-
-        // الـ 7 خانات الافتراضية
+        // الـ 7 خانات الأساسية اضْمِناً لعدم حدوث شاشة سوداء أبداً
         let sectors = [
             { text: "1000", color: "#0d243a", textColor: "#00ffcc" },
             { text: "2000", color: "#133152", textColor: "#fff" },
@@ -110,18 +75,22 @@
             { text: "حظ أوفراً", color: "#133152", textColor: "#ff5252" }
         ];
 
-        if (urlParams.has('prizes')) {
-            let prizesParam = urlParams.get('prizes');
-            if (prizesParam) {
-                let prizesList = decodeURIComponent(prizesParam).split(',');
-                if (prizesList.length >= 7) {
-                    sectors = prizesList.slice(0, 7).map((prize, index) => ({
-                        text: prize.trim(),
-                        color: index % 2 === 0 ? "#0d243a" : "#133152",
-                        textColor: index === 6 ? "#ff5252" : (index % 3 === 0 ? "#00ffcc" : "#fff")
-                    }));
+        try {
+            if (urlParams.has('prizes')) {
+                let prizesParam = urlParams.get('prizes');
+                if (prizesParam) {
+                    let decodedPrizes = decodeURIComponent(prizesParam).split(',');
+                    if (decodedPrizes.length >= 7) {
+                        sectors = decodedPrizes.slice(0, 7).map((p, i) => ({
+                            text: p.trim(),
+                            color: i % 2 === 0 ? "#0d243a" : "#133152",
+                            textColor: i === 6 ? "#ff5252" : "#00ffcc"
+                        }));
+                    }
                 }
             }
+        } catch(err) {
+            console.log("Using default sectors");
         }
 
         const canvas = document.getElementById("wheelCanvas");
@@ -143,7 +112,6 @@
             sectors.forEach((sector, i) => {
                 const angle = i * arc - Math.PI / 2;
                 
-                // رسم القطاع
                 ctx.beginPath();
                 ctx.fillStyle = sector.color;
                 ctx.moveTo(centerX, centerY);
@@ -151,12 +119,10 @@
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
 
-                // حدود الأقسام
                 ctx.strokeStyle = "#00ffcc";
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // كتابة النص داخل القطاع
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arc / 2);
@@ -168,10 +134,8 @@
             });
         }
 
-        // رسم العجلة فوراً عند التحميل لمنع الشاشة السوداء
-        window.onload = function() {
-            drawWheel();
-        };
+        // رسم العجلة فور تحميل الصفحة للتأكد من عدم ظهور شاشة سوداء
+        window.onload = drawWheel;
 
         function spinWheel() {
             if (isSpinning) return;
@@ -189,31 +153,33 @@
             const winningPrize = sectors[winningIndex].text;
             const degreesPerSector = 360 / sectors.length;
             const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
-            currentRotation = currentRotation + (360 * 6 - (currentRotation % 360)) + targetAngle;
+            currentRotation = currentRotation + (360 * 5 - (currentRotation % 360)) + targetAngle;
 
-            // التأكد من تحميل مكتبة الحركة GSAP قبل الدوران
             if (typeof gsap !== 'undefined') {
                 gsap.to(wheelWrapper, {
                     rotation: currentRotation,
-                    duration: 4,
+                    duration: 3.5,
                     ease: "power3.out",
                     onComplete: () => {
                         isSpinning = false;
                         document.getElementById('resultText').innerHTML = `✨ النتيجة: <b>${winningPrize}</b>`;
-                        tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
-                        setTimeout(() => { tg.close(); }, 3000);
+                        try {
+                            tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
+                        } catch(e) {
+                            alert(`مبروك! فزت بـ: ${winningPrize}`);
+                        }
+                        setTimeout(() => { try { tg.close(); } catch(e){} }, 2500);
                     }
                 });
             } else {
-                // بديل طوارئ في حال لم تعمل GSAP
-                wheelWrapper.style.transition = "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)";
+                wheelWrapper.style.transition = "transform 3.5s ease-out";
                 wheelWrapper.style.transform = `rotate(${currentRotation}deg)`;
                 setTimeout(() => {
                     isSpinning = false;
                     document.getElementById('resultText').innerHTML = `✨ النتيجة: <b>${winningPrize}</b>`;
-                    tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
-                    setTimeout(() => { tg.close(); }, 3000);
-                }, 4000);
+                    alert(`مبروك! فزت بـ: ${winningPrize}`);
+                    setTimeout(() => { try { tg.close(); } catch(e){} }, 2500);
+                }, 3500);
             }
         }
     </script>
