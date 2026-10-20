@@ -3,182 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ - RALHP</title>
+    <title>عجلة الحظ الفاخرة</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background-color: #0b1c2d; color: #fff; text-align: center;
-            font-family: 'Tahoma', sans-serif; margin: 0; padding: 10px;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            background: radial-gradient(circle at center, #102a45 0%, #050d1a 100%);
+            color: #fff; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px; }
-        .header-title { font-size: 18px; font-weight: bold; color: #fff; }
-        .close-btn { background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .header-title { font-size: 20px; font-weight: 800; background: linear-gradient(45deg, #ffd700, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .close-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; }
 
         .user-card {
-            background: #112840; border: 1px solid #1a3c5e; border-radius: 12px;
-            padding: 12px; width: 100%; max-width: 380px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 16px; padding: 12px 16px;
+            width: 100%; max-width: 380px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
         }
         .user-info { text-align: right; }
-        .user-name { font-size: 14px; font-weight: bold; color: #fff; }
-        .user-id { font-size: 11px; color: #8da4c4; margin-top: 2px; }
-        .user-balance { font-size: 11px; color: #8da4c4; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-        .user-balance span { color: #d4af37; font-weight: bold; }
-        .user-avatar {
-            width: 45px; height: 45px; background: #3b63db; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 16px;
-            font-weight: bold; color: #fff; border: 2px solid #5275e0;
-        }
+        .user-name { font-size: 15px; font-weight: bold; color: #fff; }
+        .user-id { font-size: 11px; color: #7f9ebc; }
+        .user-balance { font-size: 13px; color: #ffd700; font-weight: bold; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
 
-        .deposit-alert {
-            background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 10px; padding: 10px; font-size: 13px; color: #e6cb6d;
-            margin-bottom: 15px; width: 100%; max-width: 380px; text-align: center;
-        }
-
-        .wheel-section {
-            background: #112840; border: 1px solid #1a3c5e; border-radius: 14px;
-            padding: 15px 10px; width: 100%; max-width: 380px; margin-bottom: 15px; position: relative;
-        }
-        .wheel-container { position: relative; width: 290px; height: 290px; margin: 0 auto; }
-        .wheel-border {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            border: 6px dashed rgba(0, 198, 255, 0.35); box-sizing: border-box; pointer-events: none; z-index: 5;
+        .wheel-box {
+            position: relative; width: 310px; height: 310px; margin: 10px auto;
+            display: flex; align-items: center; justify-content: center;
         }
         .pointer {
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent;
-            border-top: 20px solid #00c6ff; z-index: 25; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            width: 32px; height: 36px; z-index: 30;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
         }
+        .pointer::after {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent;
+            border-top: 28px solid #ffd700;
+        }
+
         #wheelWrapper {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            overflow: hidden; will-change: transform; border: 5px solid #0d2235;
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 8px solid #1a3c5e; box-shadow: 0 0 25px rgba(0, 198, 255, 0.4), inset 0 0 15px rgba(0,0,0,0.8);
+            overflow: hidden; position: relative;
         }
         #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; }
 
         .spin-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70px; height: 70px; background: radial-gradient(circle, #2a4f78, #133152);
-            color: #fff; border: 3px solid #00c6ff; border-radius: 50%; font-size: 16px;
-            font-weight: bold; cursor: pointer; z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;
+            width: 76px; height: 76px; background: radial-gradient(circle, #ffd700 0%, #b8860b 100%);
+            color: #000; border: 4px solid #fff; border-radius: 50%; font-size: 18px;
+            font-weight: 900; cursor: pointer; z-index: 25; box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            display: flex; align-items: center; justify-content: center;
         }
-        .spin-btn span { font-size: 10px; color: #a0bed8; font-weight: normal; margin-top: 2px; }
-        .spin-btn:active { transform: translate(-50%, -50%) scale(0.95); }
-        .spin-btn.disabled { opacity: 0.7; cursor: not-allowed; }
+        .spin-btn:active { transform: translate(-50%, -50%) scale(0.92); }
+        .spin-btn.disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(1); }
 
-        .stats-section {
-            background: #112840; border: 1px solid #1a3c5e; border-radius: 14px;
-            padding: 12px; width: 100%; max-width: 380px; box-sizing: border-box; margin-bottom: 20px;
+        .history-box {
+            background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px; padding: 12px; width: 100%; max-width: 380px; margin-top: 15px;
         }
-        .stats-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #1a3c5e; padding-bottom: 8px; }
-        .stats-table-head { display: flex; justify-content: space-between; font-size: 11px; color: #6c86a8; }
-        .stats-empty { color: #6c86a8; font-size: 12px; padding: 20px 0; text-align: center; }
+        .history-title { font-size: 13px; font-weight: bold; color: #8da4c4; text-align: right; margin-bottom: 8px; }
+        .history-list { font-size: 12px; text-align: right; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <button class="close-btn" onclick="tg.close()"><i class="fas fa-times"></i> إغلاق</button>
-        <div class="header-title">عجلة LAMIN</div>
+        <div class="header-title">LAMIN VIP WHEEL</div>
         <div></div>
     </div>
 
     <div class="user-card">
         <div class="user-info">
-            <div class="user-name" id="userName">مستخدم</div>
-            <div class="user-id">معرف تلغرام: <span id="tgId">0</span></div>
-            <div class="user-balance">
-                <i class="fas fa-wallet"></i> رصيد المحفظة: <span id="userBalance">0</span> NSP
-            </div>
+            <div class="user-name" id="userName">المستخدم</div>
+            <div class="user-id">ID: <span id="tgId">0</span></div>
+            <div class="user-balance"><i class="fas fa-coins"></i> المحفظة: <span id="userBalance">0</span> NSP</div>
         </div>
-        <div class="user-avatar" id="userAvatar">US</div>
+        <div style="font-size: 28px; color: #ffd700;"><i class="fas fa-crown"></i></div>
     </div>
 
-    <div class="deposit-alert">
-        لفات عجلة الحظ مخصصة حسب حجم إيداعاتك الشهرية.
+    <div class="wheel-box">
+        <div class="pointer"></div>
+        <div id="wheelWrapper">
+            <canvas id="wheelCanvas" width="600" height="600"></canvas>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">إبدأ</button>
     </div>
 
-    <div class="wheel-section">
-        <div class="wheel-container">
-            <div class="pointer"></div>
-            <div class="wheel-border"></div>
-            
-            <div id="wheelWrapper">
-                <canvas id="wheelCanvas" width="600" height="600"></canvas>
-            </div>
-
-            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">
-                لف
-                <span>متوفرة</span>
-            </button>
-        </div>
-    </div>
-
-    <div class="stats-section">
-        <div class="stats-header">
-            <span>سجل الجوائز</span>
-            <span style="font-size: 11px; color: #8da4c4;">سجل فوري</span>
-        </div>
-        <div class="stats-table-head">
-            <span>الوقت</span>
-            <span>النتيجة</span>
-            <span>الحالة</span>
-        </div>
-        <div class="stats-empty" id="statsList">لا توجد نتائج بعد.</div>
+    <div class="history-box">
+        <div class="history-title">آخر الجوائز المحققة:</div>
+        <div class="history-list" id="historyList">جاري استقبال النتيجة...</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let userId = "0";
-        let userName = "مستخدم";
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userId = tg.initDataUnsafe.user.id;
-            userName = tg.initDataUnsafe.user.first_name || "مستخدم";
-            document.getElementById('tgId').innerText = userId;
-            document.getElementById('userName').innerText = userName;
-            document.getElementById('userAvatar').innerText = userName.substring(0, 2).toUpperCase();
-        }
+        let userId = tg.initDataUnsafe?.user?.id || "0";
+        let userName = tg.initDataUnsafe?.user?.first_name || "لاعب";
+        document.getElementById('tgId').innerText = userId;
+        document.getElementById('userName').innerText = userName;
 
         const urlParams = new URLSearchParams(window.location.search);
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
-
-        if (urlParams.has('prizes')) {
-            let prizesParam = urlParams.get('prizes');
-            if (prizesParam) {
-                let prizesList = prizesParam.split(',');
-                let newSectors = prizesList.map((prize, index) => ({
-                    text: prize,
-                    color: index % 2 === 0 ? "#133152" : "#1c4470",
-                    textColor: "#fff"
-                }));
-                localStorage.setItem('admin_sectors', JSON.stringify(newSectors));
-            }
-        }
-
-        let userWallet = parseInt(localStorage.getItem(`wallet_${userId}`)) || 0;
-        document.getElementById('userBalance').innerText = userWallet;
 
         const canvas = document.getElementById("wheelCanvas");
         const ctx = canvas.getContext("2d");
         const wheelWrapper = document.getElementById("wheelWrapper");
         const spinBtn = document.getElementById("spinBtn");
 
-        let sectors = JSON.parse(localStorage.getItem('admin_sectors')) || [
-            { text: "1000", color: "#133152", textColor: "#fff" },
-            { text: "2000", color: "#1c4470", textColor: "#fff" },
-            { text: "3000", color: "#133152", textColor: "#fff" },
-            { text: "5000", color: "#1c4470", textColor: "#fff" },
-            { text: "حظ أوفراً", color: "#133152", textColor: "#fff" },
-            { text: "15% بونص", color: "#1c4470", textColor: "#fff" }
+        let sectors = [
+            { text: "1000", color: "#1a3c5e" },
+            { text: "2000", color: "#0d2235" },
+            { text: "3000", color: "#1a3c5e" },
+            { text: "5000", color: "#b8860b" },
+            { text: "حظ أوفراً", color: "#0d2235" },
+            { text: "15% بونص", color: "#1a3c5e" }
         ];
 
         let currentRotation = 0;
@@ -188,8 +135,7 @@
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const radius = canvas.width / 2;
-            const numSectors = sectors.length;
-            const arc = (2 * Math.PI) / numSectors;
+            const arc = (2 * Math.PI) / sectors.length;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -202,17 +148,17 @@
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
 
-                ctx.strokeStyle = "rgba(0, 198, 255, 0.3)";
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#ffd700";
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arc / 2);
                 ctx.textAlign = "right";
-                ctx.fillStyle = sector.textColor;
-                ctx.font = "bold 20px Tahoma";
-                ctx.fillText(sector.text, radius - 70, 7);
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 22px Tahoma";
+                ctx.fillText(sector.text, radius - 60, 8);
                 ctx.restore();
             });
         }
@@ -228,42 +174,30 @@
             if (preDeterminedPrize) {
                 winningIndex = sectors.findIndex(s => s.text.trim() === preDeterminedPrize.trim());
                 if (winningIndex === -1) winningIndex = 0;
-            } else {
-                winningIndex = Math.floor(Math.random() * sectors.length);
             }
 
             const winningPrize = sectors[winningIndex].text;
             const degreesPerSector = 360 / sectors.length;
             const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
-            currentRotation = currentRotation + (360 * 6 - (currentRotation % 360)) + targetAngle;
+            currentRotation = currentRotation + (360 * 7 - (currentRotation % 360)) + targetAngle;
 
             gsap.to(wheelWrapper, {
                 rotation: currentRotation,
-                duration: 4.5,
+                duration: 5,
                 ease: "power4.out",
                 onComplete: () => {
                     isSpinning = false;
-
-                    if (winningPrize.includes("حظ") || winningPrize.includes("أوفر")) {
-                        tg.showAlert("حظ أوفراً! هارد لك في المرة القادمة.");
-                        addStatRecord(winningPrize, "مكتملة");
+                    
+                    if (!winningPrize.includes("حظ")) {
+                        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+                        tg.showAlert(`🎉 ألف مبروك! فزت بـ (${winningPrize})\nتمت إضافة الرصيد لحسابك بالبوت بنجاح.`);
                     } else {
-                        tg.showAlert(`🎉 مبروك! لقد فزت بـ: ${winningPrize}\nتمت الإضافة إلى محفظتك بنجاح.`);
-                        addStatRecord(winningPrize, "تمت الإضافة");
+                        tg.showAlert("حظ أوفراً في المرة القادمة!");
                     }
+
+                    document.getElementById('historyList').innerHTML = `✅ نتيجة اللفة الحالية: <b style="color:#ffd700;">${winningPrize}</b>`;
                 }
             });
-        }
-
-        function addStatRecord(prize, status) {
-            const list = document.getElementById('statsList');
-            if (list.innerText.includes("لا توجد نتائج")) list.innerHTML = "";
-            const now = new Date().toLocaleTimeString('ar-SY', {hour: '2-digit', minute:'2-digit'});
-            
-            const row = document.createElement('div');
-            row.style.cssText = "display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff;";
-            row.innerHTML = `<span>${now}</span><span>${prize}</span><span style="color: #4cd137;">${status}</span>`;
-            list.prepend(row);
         }
     </script>
 </body>
