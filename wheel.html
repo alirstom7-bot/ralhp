@@ -77,7 +77,6 @@
             { text: "حظ أوفراً", color: "#133152", textColor: "#ff5252" }
         ];
 
-        // استقبال القائمة المحدثة تماماً من لوحة تحكم الأدمن عبر الرابط
         if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
@@ -90,9 +89,7 @@
                             textColor: i === 6 ? "#ff5252" : (i === 4 ? "#ffd700" : "#00ffcc")
                         }));
                     }
-                } catch(e) {
-                    console.log("Error parsing prizes parameter");
-                }
+                } catch(e) {}
             }
         }
 
@@ -115,7 +112,6 @@
             sectors.forEach((sector, i) => {
                 const angle = i * arc - Math.PI / 2;
                 
-                // رسم القطاع الدائري
                 ctx.beginPath();
                 ctx.fillStyle = sector.color;
                 ctx.moveTo(centerX, centerY);
@@ -123,12 +119,10 @@
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
 
-                // خطوط الفصل بين الخانات
                 ctx.strokeStyle = "#00ffcc";
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // كتابة اسم الجائزة بشكل واضح داخل الشريحة
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arc / 2);
@@ -140,7 +134,6 @@
             });
         }
 
-        // رسم العجلة فور التحميل لضمان ظهور التعديلات فوراً
         window.onload = drawWheel;
         drawWheel();
 
@@ -175,7 +168,7 @@
                             tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
                         } catch(e) {}
 
-                        // إرسال البيانات فوراً إلى البوت لتحديث المحفظة وإشعار المجموعة
+                        // إرسال البيانات للبوت وإغلاق الـ WebApp لتفعيل إشعار المجموعة
                         setTimeout(() => {
                             try {
                                 tg.sendData(`${userId}|${winningPrize}`);
