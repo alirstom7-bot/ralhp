@@ -1,231 +1,28 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ الملكية الفاخرة - LAMIN</title>
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+    <!-- ... الأكواد القديمة هنا ... -->
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* ... الأكواد القديمة هنا ... */
+
+        /* 1. الخلفية الجديدة */
         body {
-            background: radial-gradient(circle at center, #0e243d 0%, #030812 100%);
-            color: #fff; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            overflow-x: hidden;
+            /* استبدال الخلفية السابقة بصورتك */
+            background: #000 url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            /* ... باقي التنسيقات السابقة ... */
         }
 
-        /* شريط العنوان الملكي */
-        .royal-header {
-            background: linear-gradient(135deg, #b8860b, #ffd700, #b8860b);
-            border: 2px solid #fff; border-radius: 14px; padding: 10px 20px;
-            width: 100%; max-width: 380px; margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .royal-title { font-size: 18px; font-weight: 900; color: #000; text-transform: uppercase; letter-spacing: 1px; }
-        .close-btn { background: #000; color: #ffd700; border: none; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
-
-        /* بطاقة معلومات اللاعب الفاخرة */
-        .user-card {
-            background: rgba(17, 40, 64, 0.85); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 14px; padding: 10px 15px;
-            width: 100%; max-width: 380px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-        .user-info { text-align: right; }
-        .user-name { font-size: 14px; font-weight: bold; color: #fff; }
-        .user-id { font-size: 11px; color: #8da4c4; }
-        .user-balance { font-size: 12px; color: #ffd700; font-weight: bold; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
-
-        /* حاوية العجلة الملكية المحاطة بالإطار الذهبي */
-        .wheel-section {
-            position: relative; width: 320px; height: 320px; margin: 5px auto 15px auto;
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        /* مؤشر السهم الفاخر */
-        .royal-pointer {
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 36px; height: 40px; z-index: 40;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
-        }
-        .royal-pointer::after {
-            content: ''; position: absolute; top: 0; left: 0;
-            width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent;
-            border-top: 32px solid #ffd700;
-        }
-
-        /* إطار العجلة الخارجي الفاخر */
-        #wheelWrapper {
-            width: 300px; height: 300px; border-radius: 50%;
-            border: 8px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), inset 0 0 20px rgba(0,0,0,0.9);
-            overflow: hidden; position: relative; background: #0b1c2d;
-        }
-        #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; }
-
-        /* زر الدوران الذهبي المركزي */
+        /* 2. دائرة ابدأ بالصورة الجديدة */
         .spin-btn {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80px; height: 80px; 
-            background: radial-gradient(circle, #fff 0%, #ffd700 50%, #b8860b 100%);
-            color: #0b1c2d; border: 4px solid #112840; border-radius: 50%; font-size: 16px;
-            font-weight: 900; cursor: pointer; z-index: 35; box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+            /* ... الأكواد القديمة هنا ... */
+            background: #ffd700 url('spin-center.png') no-repeat center center;
+            background-size: cover; /* لملء الصورة بالكامل */
+            /* ... الأكواد القديمة هنا ... */
         }
-        .spin-btn span { font-size: 9px; color: #333; font-weight: bold; margin-top: 2px; }
-        .spin-btn:active { transform: translate(-50%, -50%) scale(0.93); }
-        .spin-btn.disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(0.5); }
-
-        /* صندوق النتائج والسجل الفاخر */
-        .results-box {
-            background: rgba(17, 40, 64, 0.8); border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 14px; padding: 12px; width: 100%; max-width: 380px; box-sizing: border-box;
-        }
-        .results-title { font-size: 13px; font-weight: bold; color: #ffd700; text-align: right; margin-bottom: 6px; border-bottom: 1px solid rgba(255,215,0,0.2); padding-bottom: 4px; }
-        .result-item { font-size: 12px; text-align: right; color: #fff; padding: 4px 0; }
     </style>
 </head>
 <body>
-
-    <div class="royal-header">
-        <div class="royal-title"><i class="fas fa-crown"></i> LUXE WHEEL</div>
-        <button class="close-btn" onclick="tg.close()">إغلاق</button>
-    </div>
-
-    <div class="user-card">
-        <div class="user-info">
-            <div class="user-name" id="userName">اللاعب</div>
-            <div class="user-id">ID: <span id="tgId">0</span></div>
-            <div class="user-balance"><i class="fas fa-coins" style="color: #ffd700;"></i> المحفظة: <span id="userBalance">0</span> NSP</div>
-        </div>
-        <div style="font-size: 32px; color: #ffd700;"><i class="fas fa-gem"></i></div>
-    </div>
-
-    <div class="wheel-section">
-        <div class="royal-pointer"></div>
-        <div id="wheelWrapper">
-            <canvas id="wheelCanvas" width="600" height="600"></canvas>
-        </div>
-        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">
-            دوران
-            <span>SPIN</span>
-        </button>
-    </div>
-
-    <div class="results-box">
-        <div class="results-title"><i class="fas fa-history"></i> سجل الجوائز الفورية</div>
-        <div class="result-item" id="historyList">جاري التدوير بناءً على شريحة إيداعك...</div>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        let userId = tg.initDataUnsafe?.user?.id || "0";
-        let userName = tg.initDataUnsafe?.user?.first_name || "لاعب";
-        document.getElementById('tgId').innerText = userId;
-        document.getElementById('userName').innerText = userName;
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
-
-        const canvas = document.getElementById("wheelCanvas");
-        const ctx = canvas.getContext("2d");
-        const wheelWrapper = document.getElementById("wheelWrapper");
-        const spinBtn = document.getElementById("spinBtn");
-
-        // تصميم ألوان احترافي فاخر متناسق مع الصورة الملكية
-        let sectors = [
-            { text: "1000", color: "#133152", textColor: "#ffd700" },
-            { text: "2000", color: "#1c4470", textColor: "#fff" },
-            { text: "3000", color: "#133152", textColor: "#ffd700" },
-            { text: "5000 (كوبون)", color: "#b8860b", textColor: "#fff" },
-            { text: "حظ أوفراً", color: "#0d2235", textColor: "#ff6b6b" },
-            { text: "15% بونص", color: "#1c4470", textColor: "#ffd700" }
-        ];
-
-        let currentRotation = 0;
-        let isSpinning = false;
-
-        function drawWheel() {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = canvas.width / 2;
-            const arc = (2 * Math.PI) / sectors.length;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            sectors.forEach((sector, i) => {
-                const angle = i * arc - Math.PI / 2;
-                ctx.beginPath();
-                ctx.fillStyle = sector.color;
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, angle, angle + arc, false);
-                ctx.lineTo(centerX, centerY);
-                ctx.fill();
-
-                // حدود ذهبية فاخرة بين القطاعات
-                ctx.strokeStyle = "#ffd700";
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(angle + arc / 2);
-                ctx.textAlign = "right";
-                ctx.fillStyle = sector.textColor;
-                ctx.font = "bold 24px Tahoma";
-                ctx.fillText(sector.text, radius - 55, 8);
-                ctx.restore();
-            });
-        }
-
-        drawWheel();
-
-        function spinWheel() {
-            if (isSpinning) return;
-            isSpinning = true;
-            spinBtn.classList.add("disabled");
-
-            let winningIndex = 0;
-            if (preDeterminedPrize) {
-                winningIndex = sectors.findIndex(s => s.text.trim().includes(preDeterminedPrize.trim()));
-                if (winningIndex === -1) winningIndex = 0;
-            } else {
-                winningIndex = Math.floor(Math.random() * sectors.length);
-            }
-
-            const winningPrize = sectors[winningIndex].text;
-            const degreesPerSector = 360 / sectors.length;
-            const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
-            currentRotation = currentRotation + (360 * 8 - (currentRotation % 360)) + targetAngle;
-
-            gsap.to(wheelWrapper, {
-                rotation: currentRotation,
-                duration: 5.5,
-                ease: "power4.out",
-                onComplete: () => {
-                    isSpinning = false;
-                    
-                    if (!winningPrize.includes("حظ") && !winningPrize.includes("أوفر")) {
-                        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                        tg.showAlert(`🎉 مبروك يا فنان! لقد فزت بـ (${winningPrize})\nتمت إضافة الرصيد إلى محفظتك في البوت بنجاح.`);
-                    } else {
-                        tg.showAlert("حظ أوفراً في المرة القادمة، استمر بالإيداع لزيادة فرصك!");
-                    }
-
-                    document.getElementById('historyList').innerHTML = `✨ النتيجة النهائية: <b style="color:#ffd700;">${winningPrize}</b>`;
-                }
-            });
-        }
-    </script>
+    <!-- ... الأكواد القديمة هنا ... -->
 </body>
 </html>
