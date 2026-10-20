@@ -15,33 +15,33 @@
             color: #fff; text-align: center; font-family: Tahoma, sans-serif;
             margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-        .header-title { font-size: 18px; font-weight: bold; color: #00ffcc; margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,255,204,0.4); }
+        .header-title { font-size: 19px; font-weight: bold; color: #00ffcc; margin-bottom: 12px; text-shadow: 0 0 10px rgba(0,255,204,0.5); }
         
         .wheel-container {
-            position: relative; width: 310px; height: 310px; margin: 20px auto;
+            position: relative; width: 320px; height: 320px; margin: 15px auto;
             display: flex; align-items: center; justify-content: center;
         }
         .pointer {
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
-            border-top: 24px solid #00ffcc; z-index: 50; filter: drop-shadow(0 0 5px rgba(0,255,204,0.8));
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent;
+            border-top: 26px solid #00ffcc; z-index: 50; filter: drop-shadow(0 0 8px rgba(0,255,204,0.9));
         }
         #wheelWrapper {
-            width: 290px; height: 290px; border-radius: 50%;
-            border: 6px solid #00ffcc; box-shadow: 0 0 25px rgba(0, 255, 204, 0.5);
-            position: relative; background: #0d243a; overflow: hidden;
+            width: 300px; height: 300px; border-radius: 50%;
+            border: 8px solid #00ffcc; box-shadow: 0 0 30px rgba(0, 255, 204, 0.6);
+            position: relative; background: #061220; overflow: hidden;
         }
         #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; display: block; }
 
         .spin-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 75px; height: 75px; background: linear-gradient(135deg, #00ffcc 0%, #008866 100%);
-            color: #030812; border: 3px solid #fff; border-radius: 50%; font-size: 16px;
-            font-weight: bold; cursor: pointer; z-index: 40; box-shadow: 0 0 20px rgba(0, 255, 204, 0.8);
+            width: 76px; height: 76px; background: linear-gradient(135deg, #00ffcc 0%, #008866 100%);
+            color: #030812; border: 3px solid #fff; border-radius: 50%; font-size: 17px;
+            font-weight: 900; cursor: pointer; z-index: 40; box-shadow: 0 0 20px rgba(0, 255, 204, 0.9);
             display: flex; align-items: center; justify-content: center;
         }
         .spin-btn.disabled { opacity: 0.5; cursor: not-allowed; }
-        .result-box { margin-top: 20px; font-size: 14px; color: #00ffcc; font-weight: bold; }
+        .result-box { margin-top: 15px; font-size: 15px; color: #00ffcc; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -51,7 +51,7 @@
     <div class="wheel-container">
         <div class="pointer"></div>
         <div id="wheelWrapper">
-            <canvas id="wheelCanvas" width="500" height="500"></canvas>
+            <canvas id="wheelCanvas" width="600" height="600"></canvas>
         </div>
         <button class="spin-btn" id="spinBtn" onclick="spinWheel()">ابدأ</button>
     </div>
@@ -66,7 +66,7 @@
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
         const userId = urlParams.get('uid') || "0";
 
-        // الجوائز الـ 7 الافتراضية
+        // الجوائز الافتراضية الـ 7
         let sectors = [
             { text: "1000", color: "#0d243a", textColor: "#00ffcc" },
             { text: "2000", color: "#133152", textColor: "#fff" },
@@ -77,22 +77,23 @@
             { text: "حظ أوفراً", color: "#133152", textColor: "#ff5252" }
         ];
 
-        try {
-            if (urlParams.has('prizes')) {
-                let prizesParam = urlParams.get('prizes');
-                if (prizesParam) {
+        // استقبال القائمة المحدثة تماماً من لوحة تحكم الأدمن عبر الرابط
+        if (urlParams.has('prizes')) {
+            let prizesParam = urlParams.get('prizes');
+            if (prizesParam) {
+                try {
                     let decodedPrizes = decodeURIComponent(prizesParam).split(',');
                     if (decodedPrizes.length >= 7) {
                         sectors = decodedPrizes.slice(0, 7).map((p, i) => ({
                             text: p.trim(),
                             color: i % 2 === 0 ? "#0d243a" : "#133152",
-                            textColor: i === 6 ? "#ff5252" : (i % 3 === 0 ? "#00ffcc" : "#fff")
+                            textColor: i === 6 ? "#ff5252" : (i === 4 ? "#ffd700" : "#00ffcc")
                         }));
                     }
+                } catch(e) {
+                    console.log("Error parsing prizes parameter");
                 }
             }
-        } catch(err) {
-            console.log("Error loading prizes, using defaults");
         }
 
         const canvas = document.getElementById("wheelCanvas");
@@ -114,6 +115,7 @@
             sectors.forEach((sector, i) => {
                 const angle = i * arc - Math.PI / 2;
                 
+                // رسم القطاع الدائري
                 ctx.beginPath();
                 ctx.fillStyle = sector.color;
                 ctx.moveTo(centerX, centerY);
@@ -121,22 +123,26 @@
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
 
+                // خطوط الفصل بين الخانات
                 ctx.strokeStyle = "#00ffcc";
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 3;
                 ctx.stroke();
 
+                // كتابة اسم الجائزة بشكل واضح داخل الشريحة
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = sector.textColor;
-                ctx.font = "bold 24px Tahoma";
-                ctx.fillText(sector.text, radius - 45, 8);
+                ctx.font = "bold 26px Tahoma";
+                ctx.fillText(sector.text, radius - 55, 10);
                 ctx.restore();
             });
         }
 
+        // رسم العجلة فور التحميل لضمان ظهور التعديلات فوراً
         window.onload = drawWheel;
+        drawWheel();
 
         function spinWheel() {
             if (isSpinning) return;
@@ -169,7 +175,7 @@
                             tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
                         } catch(e) {}
 
-                        // إرسال البيانات فور التوقف إلى البوت لتحديث المحفظة وإشعار المجموعة
+                        // إرسال البيانات فوراً إلى البوت لتحديث المحفظة وإشعار المجموعة
                         setTimeout(() => {
                             try {
                                 tg.sendData(`${userId}|${winningPrize}`);
