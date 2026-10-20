@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ الملكية - LAMIN</title>
+    <title>عجلة الحظ الملكية الفاخرة - LAMIN</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,90 +13,107 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background: radial-gradient(circle at center, #0b1c2d 0%, #030812 100%);
+            /* خلفية آمنة: تدرج ملكي فاخر، وإذا توفرت الصورة ستظهر فوقه مباشرة */
+            background: #0e243d url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
             color: #fff; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .header { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .header-title { font-size: 18px; font-weight: 800; color: #ffd700; }
-        .close-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+        .royal-header {
+            background: linear-gradient(135deg, #b8860b, #ffd700, #b8860b);
+            border: 2px solid #fff; border-radius: 14px; padding: 10px 20px;
+            width: 100%; max-width: 380px; margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .royal-title { font-size: 18px; font-weight: 900; color: #000; text-transform: uppercase; }
+        .close-btn { background: #000; color: #ffd700; border: none; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
         .user-card {
-            background: rgba(17, 40, 64, 0.9); backdrop-filter: blur(10px);
+            background: rgba(17, 40, 64, 0.85); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 14px; padding: 10px 15px;
-            width: 100%; max-width: 380px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+            width: 100%; max-width: 380px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
         .user-info { text-align: right; }
         .user-name { font-size: 14px; font-weight: bold; color: #fff; }
-        .user-id { font-size: 11px; color: #7f9ebc; }
+        .user-id { font-size: 11px; color: #8da4c4; }
         .user-balance { font-size: 12px; color: #ffd700; font-weight: bold; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
 
         .wheel-section {
-            position: relative; width: 320px; height: 320px; margin: 10px auto;
+            position: relative; width: 320px; height: 320px; margin: 5px auto 15px auto;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .pointer {
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent;
-            border-top: 28px solid #ffd700; z-index: 40; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+        .royal-pointer {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 36px; height: 40px; z-index: 40;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+        }
+        .royal-pointer::after {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent;
+            border-top: 32px solid #ffd700;
         }
 
         #wheelWrapper {
             width: 300px; height: 300px; border-radius: 50%;
-            border: 8px solid #ffd700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.8);
+            border: 8px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
             overflow: hidden; position: relative; background: #0b1c2d;
         }
         #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; }
 
+        /* زر الدوران مع دعم صورة دائرة ابدأ */
         .spin-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 76px; height: 76px; background: radial-gradient(circle, #ffd700 0%, #b8860b 100%);
-            color: #0b1c2d; border: 4px solid #fff; border-radius: 50%; font-size: 16px;
-            font-weight: 900; cursor: pointer; z-index: 35; box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            width: 80px; height: 80px; 
+            background: #ffd700 url('spin-center.png') no-repeat center center;
+            background-size: cover;
+            border: 4px solid #112840; border-radius: 50%;
+            color: #0b1c2d; font-size: 14px; font-weight: 900; cursor: pointer; z-index: 35;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .spin-btn:active { transform: translate(-50%, -50%) scale(0.92); }
+        .spin-btn:active { transform: translate(-50%, -50%) scale(0.93); }
         .spin-btn.disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .history-box {
-            background: rgba(17, 40, 64, 0.6); border: 1px solid rgba(255, 215, 0, 0.15);
-            border-radius: 12px; padding: 10px; width: 100%; max-width: 380px; margin-top: 15px;
+        .results-box {
+            background: rgba(17, 40, 64, 0.8); border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 14px; padding: 12px; width: 100%; max-width: 380px; box-sizing: border-box;
         }
-        .history-title { font-size: 12px; font-weight: bold; color: #ffd700; text-align: right; margin-bottom: 5px; }
-        .history-list { font-size: 11px; text-align: right; color: #fff; }
+        .results-title { font-size: 13px; font-weight: bold; color: #ffd700; text-align: right; margin-bottom: 6px; border-bottom: 1px solid rgba(255,215,0,0.2); padding-bottom: 4px; }
+        .result-item { font-size: 12px; text-align: right; color: #fff; padding: 4px 0; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <button class="close-btn" onclick="tg.close()"><i class="fas fa-times"></i> إغلاق</button>
-        <div class="header-title"><i class="fas fa-crown"></i> LUXE WHEEL</div>
-        <div></div>
+    <div class="royal-header">
+        <div class="royal-title"><i class="fas fa-crown"></i> LUXE WHEEL</div>
+        <button class="close-btn" onclick="tg.close()">إغلاق</button>
     </div>
 
     <div class="user-card">
         <div class="user-info">
             <div class="user-name" id="userName">اللاعب</div>
             <div class="user-id">ID: <span id="tgId">0</span></div>
-            <div class="user-balance"><i class="fas fa-coins"></i> المحفظة: <span id="userBalance">0</span> NSP</div>
+            <div class="user-balance"><i class="fas fa-coins" style="color: #ffd700;"></i> المحفظة: <span id="userBalance">0</span> NSP</div>
         </div>
-        <div style="font-size: 30px; color: #ffd700;"><i class="fas fa-gem"></i></div>
+        <div style="font-size: 32px; color: #ffd700;"><i class="fas fa-gem"></i></div>
     </div>
 
     <div class="wheel-section">
-        <div class="pointer"></div>
+        <div class="royal-pointer"></div>
         <div id="wheelWrapper">
             <canvas id="wheelCanvas" width="600" height="600"></canvas>
         </div>
-        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">ابدأ</button>
+        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">دوران</button>
     </div>
 
-    <div class="history-box">
-        <div class="history-title">سجل النتيجة الفورية:</div>
-        <div class="history-list" id="historyList">جاهز للتدوير بناءً على رصيدك...</div>
+    <div class="results-box">
+        <div class="results-title"><i class="fas fa-history"></i> سجل الجوائز الفورية</div>
+        <div class="result-item" id="historyList">جاري التدوير بناءً على شريحة إيداعك...</div>
     </div>
 
     <script>
@@ -178,23 +195,23 @@
             const winningPrize = sectors[winningIndex].text;
             const degreesPerSector = 360 / sectors.length;
             const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
-            currentRotation = currentRotation + (360 * 7 - (currentRotation % 360)) + targetAngle;
+            currentRotation = currentRotation + (360 * 8 - (currentRotation % 360)) + targetAngle;
 
             gsap.to(wheelWrapper, {
                 rotation: currentRotation,
-                duration: 5,
+                duration: 5.5,
                 ease: "power4.out",
                 onComplete: () => {
                     isSpinning = false;
                     
                     if (!winningPrize.includes("حظ") && !winningPrize.includes("أوفر")) {
                         confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                        tg.showAlert(`🎉 ألف مبروك! فزت بـ (${winningPrize})\nتمت إضافة الرصيد إلى محفظتك بنجاح.`);
+                        tg.showAlert(`🎉 مبروك يا فنان! فزت بـ (${winningPrize})\nتمت إضافة الرصيد إلى محفظتك بنجاح.`);
                     } else {
                         tg.showAlert("حظ أوفراً في المرة القادمة!");
                     }
 
-                    document.getElementById('historyList').innerHTML = `✨ النتيجة: <b style="color:#ffd700;">${winningPrize}</b>`;
+                    document.getElementById('historyList').innerHTML = `✨ النتيجة النهائية: <b style="color:#ffd700;">${winningPrize}</b>`;
                 }
             });
         }
