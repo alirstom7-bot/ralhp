@@ -11,10 +11,11 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background: #061220; color: #fff; text-align: center; font-family: Tahoma, sans-serif;
+            background: radial-gradient(circle at center, #0f2b46 0%, #061220 100%);
+            color: #fff; text-align: center; font-family: Tahoma, sans-serif;
             margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-        .header-title { font-size: 18px; font-weight: bold; color: #00ffcc; margin-bottom: 15px; }
+        .header-title { font-size: 18px; font-weight: bold; color: #00ffcc; margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,255,204,0.4); }
         
         .wheel-container {
             position: relative; width: 310px; height: 310px; margin: 20px auto;
@@ -23,24 +24,24 @@
         .pointer {
             position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
-            border-top: 24px solid #00ffcc; z-index: 50;
+            border-top: 24px solid #00ffcc; z-index: 50; filter: drop-shadow(0 0 5px rgba(0,255,204,0.8));
         }
         #wheelWrapper {
             width: 290px; height: 290px; border-radius: 50%;
-            border: 6px solid #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            border: 6px solid #00ffcc; box-shadow: 0 0 25px rgba(0, 255, 204, 0.5);
             position: relative; background: #0d243a; overflow: hidden;
         }
         #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; display: block; }
 
         .spin-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70px; height: 70px; background: #00ffcc; color: #030812;
-            border: 3px solid #fff; border-radius: 50%; font-size: 16px;
-            font-weight: bold; cursor: pointer; z-index: 40; box-shadow: 0 0 15px rgba(0, 255, 204, 0.8);
+            width: 75px; height: 75px; background: linear-gradient(135deg, #00ffcc 0%, #008866 100%);
+            color: #030812; border: 3px solid #fff; border-radius: 50%; font-size: 16px;
+            font-weight: bold; cursor: pointer; z-index: 40; box-shadow: 0 0 20px rgba(0, 255, 204, 0.8);
             display: flex; align-items: center; justify-content: center;
         }
         .spin-btn.disabled { opacity: 0.5; cursor: not-allowed; }
-        .result-box { margin-top: 20px; font-size: 14px; color: #00ffcc; }
+        .result-box { margin-top: 20px; font-size: 14px; color: #00ffcc; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -63,8 +64,9 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
+        const userId = urlParams.get('uid') || "0";
 
-        // الـ 7 خانات الأساسية اضْمِناً لعدم حدوث شاشة سوداء أبداً
+        // الجوائز الـ 7 الافتراضية
         let sectors = [
             { text: "1000", color: "#0d243a", textColor: "#00ffcc" },
             { text: "2000", color: "#133152", textColor: "#fff" },
@@ -84,13 +86,13 @@
                         sectors = decodedPrizes.slice(0, 7).map((p, i) => ({
                             text: p.trim(),
                             color: i % 2 === 0 ? "#0d243a" : "#133152",
-                            textColor: i === 6 ? "#ff5252" : "#00ffcc"
+                            textColor: i === 6 ? "#ff5252" : (i % 3 === 0 ? "#00ffcc" : "#fff")
                         }));
                     }
                 }
             }
         } catch(err) {
-            console.log("Using default sectors");
+            console.log("Error loading prizes, using defaults");
         }
 
         const canvas = document.getElementById("wheelCanvas");
@@ -134,7 +136,6 @@
             });
         }
 
-        // رسم العجلة فور تحميل الصفحة للتأكد من عدم ظهور شاشة سوداء
         window.onload = drawWheel;
 
         function spinWheel() {
@@ -153,33 +154,31 @@
             const winningPrize = sectors[winningIndex].text;
             const degreesPerSector = 360 / sectors.length;
             const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
-            currentRotation = currentRotation + (360 * 5 - (currentRotation % 360)) + targetAngle;
+            currentRotation = currentRotation + (360 * 6 - (currentRotation % 360)) + targetAngle;
 
             if (typeof gsap !== 'undefined') {
                 gsap.to(wheelWrapper, {
                     rotation: currentRotation,
-                    duration: 3.5,
+                    duration: 4,
                     ease: "power3.out",
                     onComplete: () => {
                         isSpinning = false;
                         document.getElementById('resultText').innerHTML = `✨ النتيجة: <b>${winningPrize}</b>`;
+                        
                         try {
                             tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
-                        } catch(e) {
-                            alert(`مبروك! فزت بـ: ${winningPrize}`);
-                        }
-                        setTimeout(() => { try { tg.close(); } catch(e){} }, 2500);
+                        } catch(e) {}
+
+                        // إرسال البيانات فور التوقف إلى البوت لتحديث المحفظة وإشعار المجموعة
+                        setTimeout(() => {
+                            try {
+                                tg.sendData(`${userId}|${winningPrize}`);
+                            } catch(e) {
+                                tg.close();
+                            }
+                        }, 1500);
                     }
                 });
-            } else {
-                wheelWrapper.style.transition = "transform 3.5s ease-out";
-                wheelWrapper.style.transform = `rotate(${currentRotation}deg)`;
-                setTimeout(() => {
-                    isSpinning = false;
-                    document.getElementById('resultText').innerHTML = `✨ النتيجة: <b>${winningPrize}</b>`;
-                    alert(`مبروك! فزت بـ: ${winningPrize}`);
-                    setTimeout(() => { try { tg.close(); } catch(e){} }, 2500);
-                }, 3500);
             }
         }
     </script>
