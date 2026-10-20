@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ الملكية - LAMIN</title>
+    <title>عجلة الحظ الملكية - 1Win Style</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,25 +13,26 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background: radial-gradient(circle at center, #0b1c2d 0%, #030812 100%);
+            /* خلفية طراز 1Win: أزرق عميق مع تدرجات نيون فخمة */
+            background: radial-gradient(circle at center, #0f2b46 0%, #061220 100%);
             color: #fff; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; padding: 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
         .header { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .header-title { font-size: 18px; font-weight: 800; color: #ffd700; }
-        .close-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+        .header-title { font-size: 18px; font-weight: 800; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.4); }
+        .close-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
 
         .user-card {
-            background: rgba(17, 40, 64, 0.9); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 14px; padding: 10px 15px;
+            background: rgba(13, 36, 58, 0.9); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 204, 0.3); border-radius: 14px; padding: 10px 15px;
             width: 100%; max-width: 380px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
         .user-info { text-align: right; }
         .user-name { font-size: 14px; font-weight: bold; color: #fff; }
         .user-id { font-size: 11px; color: #7f9ebc; }
-        .user-balance { font-size: 12px; color: #ffd700; font-weight: bold; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+        .user-balance { font-size: 12px; color: #00ffcc; font-weight: bold; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
 
         .wheel-section {
             position: relative; width: 320px; height: 320px; margin: 10px auto;
@@ -41,31 +42,31 @@
         .pointer {
             position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent;
-            border-top: 28px solid #ffd700; z-index: 40; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+            border-top: 28px solid #00ffcc; z-index: 40; filter: drop-shadow(0 0 8px rgba(0,255,204,0.8));
         }
 
         #wheelWrapper {
             width: 300px; height: 300px; border-radius: 50%;
-            border: 8px solid #ffd700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.8);
-            overflow: hidden; position: relative; background: #0b1c2d;
+            border: 8px solid #00ffcc; box-shadow: 0 0 30px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0,0,0,0.8);
+            overflow: hidden; position: relative; background: #061220;
         }
         #wheelCanvas { width: 100%; height: 100%; border-radius: 50%; }
 
         .spin-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 76px; height: 76px; background: radial-gradient(circle, #ffd700 0%, #b8860b 100%);
-            color: #0b1c2d; border: 4px solid #fff; border-radius: 50%; font-size: 16px;
-            font-weight: 900; cursor: pointer; z-index: 35; box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            width: 76px; height: 76px; background: radial-gradient(circle, #00ffcc 0%, #008866 100%);
+            color: #030812; border: 4px solid #fff; border-radius: 50%; font-size: 16px;
+            font-weight: 900; cursor: pointer; z-index: 35; box-shadow: 0 0 20px rgba(0, 255, 204, 0.7);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .spin-btn:active { transform: translate(-50%, -50%) scale(0.92); }
         .spin-btn.disabled { opacity: 0.6; cursor: not-allowed; }
 
         .history-box {
-            background: rgba(17, 40, 64, 0.6); border: 1px solid rgba(255, 215, 0, 0.15);
+            background: rgba(13, 36, 58, 0.6); border: 1px solid rgba(0, 255, 204, 0.2);
             border-radius: 12px; padding: 10px; width: 100%; max-width: 380px; margin-top: 15px;
         }
-        .history-title { font-size: 12px; font-weight: bold; color: #ffd700; text-align: right; margin-bottom: 5px; }
+        .history-title { font-size: 12px; font-weight: bold; color: #00ffcc; text-align: right; margin-bottom: 5px; }
         .history-list { font-size: 11px; text-align: right; color: #fff; }
     </style>
 </head>
@@ -73,7 +74,7 @@
 
     <div class="header">
         <button class="close-btn" onclick="tg.close()"><i class="fas fa-times"></i> إغلاق</button>
-        <div class="header-title"><i class="fas fa-crown"></i> LUXE WHEEL</div>
+        <div class="header-title"><i class="fas fa-bolt"></i> 1WIN WHEEL</div>
         <div></div>
     </div>
 
@@ -83,7 +84,7 @@
             <div class="user-id">ID: <span id="tgId">0</span></div>
             <div class="user-balance"><i class="fas fa-coins"></i> المحفظة: <span id="userBalance">0</span> NSP</div>
         </div>
-        <div style="font-size: 30px; color: #ffd700;"><i class="fas fa-gem"></i></div>
+        <div style="font-size: 30px; color: #00ffcc;"><i class="fas fa-gem"></i></div>
     </div>
 
     <div class="wheel-section">
@@ -111,19 +112,32 @@
         const urlParams = new URLSearchParams(window.location.search);
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
 
+        // استقبال الجوائز ديناميكياً من البوت عبر رابط الـ URL
+        let sectors = [
+            { text: "1000", color: "#0d243a", textColor: "#00ffcc" },
+            { text: "2000", color: "#133152", textColor: "#fff" },
+            { text: "3000", color: "#0d243a", textColor: "#00ffcc" },
+            { text: "5000", color: "#008866", textColor: "#fff" },
+            { text: "حظ أوفراً", color: "#1b2a47", textColor: "#ff5252" },
+            { text: "15% بونص", color: "#133152", textColor: "#00ffcc" }
+        ];
+
+        if (urlParams.has('prizes')) {
+            let prizesParam = urlParams.get('prizes');
+            if (prizesParam) {
+                let prizesList = decodeURIComponent(prizesParam).split(',');
+                sectors = prizesList.map((prize, index) => ({
+                    text: prize.trim(),
+                    color: index % 2 === 0 ? "#0d243a" : "#133152",
+                    textColor: index % 3 === 0 ? "#00ffcc" : "#fff"
+                }));
+            }
+        }
+
         const canvas = document.getElementById("wheelCanvas");
         const ctx = canvas.getContext("2d");
         const wheelWrapper = document.getElementById("wheelWrapper");
         const spinBtn = document.getElementById("spinBtn");
-
-        let sectors = [
-            { text: "1000", color: "#133152", textColor: "#ffd700" },
-            { text: "2000", color: "#1c4470", textColor: "#fff" },
-            { text: "3000", color: "#133152", textColor: "#ffd700" },
-            { text: "5000", color: "#b8860b", textColor: "#fff" },
-            { text: "حظ أوفراً", color: "#0d2235", textColor: "#ff6b6b" },
-            { text: "15% بونص", color: "#1c4470", textColor: "#ffd700" }
-        ];
 
         let currentRotation = 0;
         let isSpinning = false;
@@ -145,7 +159,7 @@
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
 
-                ctx.strokeStyle = "#ffd700";
+                ctx.strokeStyle = "#00ffcc";
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
@@ -154,7 +168,7 @@
                 ctx.rotate(angle + arc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = sector.textColor;
-                ctx.font = "bold 24px Tahoma";
+                ctx.font = "bold 22px Tahoma";
                 ctx.fillText(sector.text, radius - 55, 8);
                 ctx.restore();
             });
@@ -169,7 +183,7 @@
 
             let winningIndex = 0;
             if (preDeterminedPrize) {
-                winningIndex = sectors.findIndex(s => s.text.trim().includes(preDeterminedPrize.trim()));
+                winningIndex = sectors.findIndex(s => s.text.trim() === preDeterminedPrize.trim());
                 if (winningIndex === -1) winningIndex = 0;
             } else {
                 winningIndex = Math.floor(Math.random() * sectors.length);
@@ -189,12 +203,12 @@
                     
                     if (!winningPrize.includes("حظ") && !winningPrize.includes("أوفر")) {
                         confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                        tg.showAlert(`🎉 ألف مبروك! فزت بـ (${winningPrize})\nتمت إضافة الرصيد إلى محفظتك بنجاح.`);
+                        tg.showAlert(`🎉 مبروك! فزت بـ (${winningPrize})\nتمت إضافة الرصيد إلى محفظتك بنجاح.`);
                     } else {
                         tg.showAlert("حظ أوفراً في المرة القادمة!");
                     }
 
-                    document.getElementById('historyList').innerHTML = `✨ النتيجة: <b style="color:#ffd700;">${winningPrize}</b>`;
+                    document.getElementById('historyList').innerHTML = `✨ النتيجة: <b style="color:#00ffcc;">${winningPrize}</b>`;
                 }
             });
         }
