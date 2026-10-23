@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ الفاخرة</title>
+    <title>RALPH</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -77,7 +77,7 @@
             { text: "حظ أوفراً", color: "#133152", textColor: "#ff5252" }
         ];
 
-        // استقبال الجوائز المعدلة من لوحة تحكم الأدمن عبر البوت
+        // استقبال الجوائز الـ 7 المعدلة من لوحة تحكم الأدمن عبر الرابط
         if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
@@ -169,7 +169,7 @@
                             tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
                         } catch(e) {}
 
-                        // إرسال البيانات للبوت عبر tg.sendData وإغلاق النافذة
+                        // إرسال البيانات حصراً للبوت عبر tg.sendData ثم إغلاق نافذة الـ WebApp
                         setTimeout(() => {
                             try {
                                 tg.sendData(`${userId}|${winningPrize}`);
