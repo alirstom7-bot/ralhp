@@ -58,12 +58,12 @@
 
     <div class="result-box" id="resultText">اضغط على زر (ابدأ) لتدوير العجلة</div>
 
-    <script>
+   <script>
         let tg = window.Telegram.WebApp;
         try { tg.expand(); } catch(e) {}
 
         const urlParams = new URLSearchParams(window.location.search);
-        const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')) : null;
+        const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')).trim() : null;
         const userId = urlParams.get('uid') || "0";
 
         // الجوائز الافتراضية الـ 7 الاحتياطية
@@ -77,12 +77,17 @@
             { text: "حظ أوفراً", color: "#133152", textColor: "#ff5252" }
         ];
 
-        // استقبال الجوائز الـ 7 المعدلة من لوحة تحكم الأدمن عبر الرابط
+        // استقبال الجوائز الـ 7 المعدلة من لوحة تحكم الأدمن عبر الرابط بشكل آمن 100%
         if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
                 try {
-                    let decodedPrizes = decodeURIComponent(prizesParam).split(',');
+                    // فك التشفير مرتين لضمان قراءة العربية والرموز بشكل صحيح
+                    let decodedString = decodeURIComponent(prizesParam);
+                    if (decodedString.includes('%')) {
+                        decodedString = decodeURIComponent(decodedString);
+                    }
+                    let decodedPrizes = decodedString.split(',');
                     if (decodedPrizes.length >= 7) {
                         sectors = decodedPrizes.slice(0, 7).map((p, i) => ({
                             text: p.trim(),
@@ -90,10 +95,11 @@
                             textColor: i === 6 ? "#ff5252" : (i === 4 ? "#ffd700" : "#00ffcc")
                         }));
                     }
-                } catch(e) {}
+                } catch(e) {
+                    console.log("Error parsing prizes:", e);
+                }
             }
         }
-
         const canvas = document.getElementById("wheelCanvas");
         const ctx = canvas.getContext("2d");
         const wheelWrapper = document.getElementById("wheelWrapper");
@@ -172,7 +178,7 @@
                         // إرسال البيانات حصراً للبوت عبر tg.sendData ثم إغلاق نافذة الـ WebApp
                         setTimeout(() => {
                             try {
-                                tg.sendData(`${userId}|${winningPrize}`);
+                                tg.sendData(userId + "|" + winningPrize);
                             } catch(e) {
                                 console.log("Send data error:", e);
                             }
