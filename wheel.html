@@ -1,131 +1,326 @@
-<script>
-    let tg = window.Telegram.WebApp;
-    try { tg.expand(); } catch(e) {}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>عجلة الفرصة</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')).trim() : null;
-    const userId = urlParams.get('uid') || "0";
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            /* خلفية خضراء داكنة فاخرة مطابقة للصورة مع نقوش دقيقة */
+            background-color: #0b1e16;
+            background-image: 
+                radial-gradient(circle at center, rgba(16, 53, 38, 0.8) 0%, rgba(4, 15, 11, 0.95) 100%),
+                repeating-radial-gradient(circle at 0 0, transparent 0, rgba(0,0,0,0.4) 40px);
+            color: #fff;
+            text-align: center;
+            font-family: Tahoma, sans-serif;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            overflow: hidden;
+        }
 
-    // الجوائز الافتراضية
-    let sectors = [
-        { text: "10 ل.س", color: "#166946", textColor: "#fff" },
-        { text: "تدوير مجاني", color: "#222a35", textColor: "#fff" },
-        { text: "25 ل.س", color: "#166946", textColor: "#fff" },
-        { text: "100 ل.س", color: "#222a35", textColor: "#fff" },
-        { text: "200 ل.س", color: "#166946", textColor: "#fff" },
-        { text: "50 ل.س", color: "#222a35", textColor: "#fff" }
-    ];
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
 
-    // استقبال الجوائز المحدثة من لوحة الأدمن عبر الرابط فوراً
-    if (urlParams.has('prizes')) {
-        let prizesParam = urlParams.get('prizes');
-        if (prizesParam) {
-            try {
-                let decodedString = decodeURIComponent(prizesParam);
-                if (decodedString.includes('%')) {
-                    decodedString = decodeURIComponent(decodedString);
+        .header-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d4af37; /* لون ذهبي فاخر للعنوان */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 330px;
+            height: 330px;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* المؤشر الفضي العلوي المتدرج */
+        .pointer {
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 28px solid #c0c0c0;
+            z-index: 60;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.7));
+        }
+        
+        .pointer::after {
+            content: '';
+            position: absolute;
+            top: -28px;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid #e8e8e8;
+            z-index: 61;
+        }
+
+        /* إطار العجلة المعدني الفضي الخارجي */
+        #wheelWrapper {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            border: 12px solid #b5bcc2;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0,0,0,0.6);
+            position: relative;
+            background: #111;
+            overflow: hidden;
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: block;
+        }
+
+        /* زر "تدوير" الدائري في المنتصف تماماً */
+        .spin-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 82px;
+            height: 82px;
+            background: linear-gradient(145deg, #d8e0e6 0%, #9aa3ab 100%);
+            color: #1a232a;
+            border: 4px solid #ffffff;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 50;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .spin-btn:active { transform: translate(-50%, -50%) scale(0.95); }
+        .spin-btn.disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* صندوق الشروط والتديورات المتبقية في الأسفل */
+        .footer-card {
+            background: rgba(18, 26, 22, 0.85);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 12px 15px;
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .spins-left {
+            font-size: 15px;
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .condition-text {
+            font-size: 13px;
+            color: #c5c5c5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .condition-text span {
+            color: #00ffcc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <span style="font-size: 20px;">🎡</span>
+        <div class="header-title">عجلة الفرصة</div>
+    </div>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div id="wheelWrapper">
+            <canvas id="wheelCanvas" width="600" height="600"></canvas>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">تدوير</button>
+    </div>
+
+    <!-- البطاقة السفلية المطابقة للصورة تماماً -->
+    <div class="footer-card">
+        <div class="spins-left">التدويرات المتبقية: <span id="spinsCount">0</span></div>
+        <div class="condition-text">
+            💳 عليك أن تشحن مبلغ <span>1,000 ل.س</span> لتحصل على لفة مجانية
+        </div>
+    </div>
+
+   <script>
+        let tg = window.Telegram.WebApp;
+        try { tg.expand(); } catch(e) {}
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')).trim() : null;
+        const userId = urlParams.get('uid') || "0";
+
+        // الجوائز الـ 6 الافتراضية المطابقة لألوان وتوزيع الصورة (أخضر ورمادي غامق/أسود)
+        let sectors = [
+            { text: "10 ل.س", color: "#166946", textColor: "#fff" },       // أخضر
+            { text: "تدوير مجاني", color: "#222a35", textColor: "#fff" },  // رمادي داكن
+            { text: "25 ل.س", color: "#166946", textColor: "#fff" },       // أخضر
+            { text: "100 l.s", color: "#222a35", textColor: "#fff" },     // رمادي داكن
+            { text: "200 ل.س", color: "#166946", textColor: "#fff" },      // أخضر
+            { text: "50 ل.س", color: "#222a35", textColor: "#fff" }        // رمادي داكن
+        ];
+
+        // استقبال الجوائز المعدلة من لوحة الأدمن عبر البوت إذا وجدت
+        if (urlParams.has('prizes')) {
+            let prizesParam = urlParams.get('prizes');
+            if (prizesParam) {
+                try {
+                    let decodedString = decodeURIComponent(prizesParam);
+                    if (decodedString.includes('%')) {
+                        decodedString = decodeURIComponent(decodedString);
+                    }
+                    let decodedPrizes = decodedString.split(',');
+                    if (decodedPrizes.length > 0) {
+                        sectors = decodedPrizes.map((p, i) => ({
+                            text: p.trim(),
+                            color: i % 2 === 0 ? "#166946" : "#222a35",
+                            textColor: "#fff"
+                        }));
+                    }
+                } catch(e) {
+                    console.log("Error parsing prizes:", e);
                 }
-                let decodedPrizes = decodedString.split(',');
-                if (decodedPrizes.length > 0) {
-                    sectors = decodedPrizes.map((p, i) => ({
-                        text: p.trim(),
-                        color: i % 2 === 0 ? "#166946" : "#222a35",
-                        textColor: "#fff"
-                    }));
-                }
-            } catch(e) {
-                console.log("Error parsing prizes:", e);
             }
         }
-    }
 
-    const canvas = document.getElementById("wheelCanvas");
-    const ctx = canvas.getContext("2d");
-    const wheelWrapper = document.getElementById("wheelWrapper");
-    const spinBtn = document.getElementById("spinBtn");
+        const canvas = document.getElementById("wheelCanvas");
+        const ctx = canvas.getContext("2d");
+        const wheelWrapper = document.getElementById("wheelWrapper");
+        const spinBtn = document.getElementById("spinBtn");
 
-    let currentRotation = 0;
-    let isSpinning = false;
+        let currentRotation = 0;
+        let isSpinning = false;
 
-    function drawWheel() {
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const radius = canvas.width / 2;
-        const arc = (2 * Math.PI) / sectors.length;
+        function drawWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2;
+            const arc = (2 * Math.PI) / sectors.length;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        sectors.forEach((sector, i) => {
-            const angle = i * arc - Math.PI / 2;
-            
-            ctx.beginPath();
-            ctx.fillStyle = sector.color;
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, angle, angle + arc, false);
-            ctx.lineTo(centerX, centerY);
-            ctx.fill();
+            sectors.forEach((sector, i) => {
+                const angle = i * arc - Math.PI / 2;
+                
+                // رسم قطاع العجلة
+                ctx.beginPath();
+                ctx.fillStyle = sector.color;
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, angle, angle + arc, false);
+                ctx.lineTo(centerX, centerY);
+                ctx.fill();
 
-            ctx.strokeStyle = "#2c3e35";
-            ctx.lineWidth = 3;
-            ctx.stroke();
+                // خط فاصل بين الأقسام بلون فضي خفيف
+                ctx.strokeStyle = "#2c3e35";
+                ctx.lineWidth = 3;
+                ctx.stroke();
 
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(angle + arc / 2);
-            ctx.textAlign = "right";
-            ctx.fillStyle = sector.textColor;
-            ctx.font = "bold 24px Tahoma";
-            ctx.fillText(sector.text, radius - 60, 10);
-            ctx.restore();
-        });
-    }
-
-    window.onload = drawWheel;
-    drawWheel();
-
-    function spinWheel() {
-        if (isSpinning) return;
-        isSpinning = true;
-        spinBtn.classList.add("disabled");
-
-        let winningIndex = 0;
-        if (preDeterminedPrize) {
-            winningIndex = sectors.findIndex(s => s.text.trim() === preDeterminedPrize.trim());
-            if (winningIndex === -1) winningIndex = 0;
-        } else {
-            winningIndex = Math.floor(Math.random() * sectors.length);
-        }
-
-        const winningPrize = sectors[winningIndex].text;
-        const degreesPerSector = 360 / sectors.length;
-        const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
-        currentRotation = currentRotation + (360 * 6 - (currentRotation % 360)) + targetAngle;
-
-        if (typeof gsap !== 'undefined') {
-            gsap.to(wheelWrapper, {
-                rotation: currentRotation,
-                duration: 4.5,
-                ease: "power3.out",
-                onComplete: () => {
-                    isSpinning = false;
-                    
-                    try {
-                        tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
-                    } catch(e) {}
-
-                    setTimeout(() => {
-                        try {
-                            tg.sendData(userId + "|" + winningPrize);
-                        } catch(e) {
-                            console.log("Send data error:", e);
-                        }
-                        
-                        try {
-                            tg.close();
-                        } catch(e) {}
-                    }, 1200);
-                }
+                // رسم النص والرموز داخل القسم
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = sector.textColor;
+                ctx.font = "bold 24px Tahoma";
+                
+                // إزاحة النص للداخل قليلاً ليتسق مع التصميم
+                ctx.fillText(sector.text, radius - 60, 10);
+                
+                ctx.restore();
             });
         }
-    }
-</script>
+
+        window.onload = drawWheel;
+        drawWheel();
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+            spinBtn.classList.add("disabled");
+
+            let winningIndex = 0;
+            if (preDeterminedPrize) {
+                winningIndex = sectors.findIndex(s => s.text.trim() === preDeterminedPrize.trim());
+                if (winningIndex === -1) winningIndex = 0;
+            } else {
+                winningIndex = Math.floor(Math.random() * sectors.length);
+            }
+
+            const winningPrize = sectors[winningIndex].text;
+            const degreesPerSector = 360 / sectors.length;
+            const targetAngle = 360 - (winningIndex * degreesPerSector) - (degreesPerSector / 2);
+            currentRotation = currentRotation + (360 * 6 - (currentRotation % 360)) + targetAngle;
+
+            if (typeof gsap !== 'undefined') {
+                gsap.to(wheelWrapper, {
+                    rotation: currentRotation,
+                    duration: 4.5,
+                    ease: "power3.out",
+                    onComplete: () => {
+                        isSpinning = false;
+                        
+                        try {
+                            tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
+                        } catch(e) {}
+
+                        // إرسال البيانات حصراً للبوت عبر tg.sendData ثم إغلاق نافذة الـ WebApp
+                        setTimeout(() => {
+                            try {
+                                tg.sendData(userId + "|" + winningPrize);
+                            } catch(e) {
+                                console.log("Send data error:", e);
+                            }
+                            
+                            try {
+                                tg.close();
+                            } catch(e) {}
+                        }, 1200);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
