@@ -12,7 +12,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            /* خلفية خضراء داكنة فاخرة مطابقة للصورة مع نقوش دقيقة */
             background-color: #0b1e16;
             background-image: 
                 radial-gradient(circle at center, rgba(16, 53, 38, 0.8) 0%, rgba(4, 15, 11, 0.95) 100%),
@@ -41,7 +40,7 @@
         .header-title {
             font-size: 22px;
             font-weight: bold;
-            color: #d4af37; /* لون ذهبي فاخر للعنوان */
+            color: #d4af37;
             text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
@@ -55,7 +54,6 @@
             justify-content: center;
         }
 
-        /* المؤشر الفضي العلوي المتدرج */
         .pointer {
             position: absolute;
             top: -6px;
@@ -83,7 +81,6 @@
             z-index: 61;
         }
 
-        /* إطار العجلة المعدني الفضي الخارجي */
         #wheelWrapper {
             width: 320px;
             height: 320px;
@@ -102,7 +99,6 @@
             display: block;
         }
 
-        /* زر "تدوير" الدائري في المنتصف تماماً */
         .spin-btn {
             position: absolute;
             top: 50%;
@@ -128,7 +124,6 @@
         .spin-btn:active { transform: translate(-50%, -50%) scale(0.95); }
         .spin-btn.disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* صندوق الشروط والتديورات المتبقية في الأسفل */
         .footer-card {
             background: rgba(18, 26, 22, 0.85);
             border: 1px solid rgba(212, 175, 55, 0.3);
@@ -176,15 +171,14 @@
         <button class="spin-btn" id="spinBtn" onclick="spinWheel()">تدوير</button>
     </div>
 
-    <!-- البطاقة السفلية المطابقة للصورة تماماً -->
     <div class="footer-card">
-        <div class="spins-left">التدويرات المتبقية: <span id="spinsCount">0</span></div>
+        <div class="spins-left">التدويرات المتبقية: <span id="spinsCount">1</span></div>
         <div class="condition-text">
-            💳 عليك أن تشحن مبلغ <span>1,000 ل.س</span> لتحصل على لفة مجانية
+            💳 تدوير عجلة الحظ المتاحة بحسب رصيدك وعملياتك
         </div>
     </div>
 
-   <script>
+    <script>
         let tg = window.Telegram.WebApp;
         try { tg.expand(); } catch(e) {}
 
@@ -192,33 +186,44 @@
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')).trim() : null;
         const userId = urlParams.get('uid') || "0";
 
-        // الجوائز الـ 6 الافتراضية المطابقة لألوان وتوزيع الصورة (أخضر ورمادي غامق/أسود)
+        // الجوائز الافتراضية
         let sectors = [
-            { text: "1000 ل.س", color: "#166946", textColor: "#fff" },       // أخضر
-            { text: "2000", color: "#222a35", textColor: "#fff" },  // رمادي داكن
-            { text: "3000 ل.س", color: "#166946", textColor: "#fff" },       // أخضر
-            { text: "5000 l.s", color: "#222a35", textColor: "#fff" },     // رمادي داكن
-            { text: "15% بونص", color: "#166946", textColor: "#fff" },      // أخضر
-            { text: "10% بونص", color: "#222a35", textColor: "#fff" }        // رمادي داكن
-            { text: "10% بونص", color: "#ff0000", textColor: "#fff" }        // أحمر
+            { text: "1000", color: "#166946", textColor: "#fff" },
+            { text: "2000", color: "#222a35", textColor: "#fff" },
+            { text: "3000", color: "#166946", textColor: "#fff" },
+            { text: "5000", color: "#222a35", textColor: "#fff" },
+            { text: "15% بونص", color: "#166946", textColor: "#ffd700" },
+            { text: "10% بونص", color: "#222a35", textColor: "#ffd700" },
+            { text: "حظ أوفراً", color: "#166946", textColor: "#ff5252" }
         ];
 
-        // استقبال الجوائز المعدلة من لوحة الأدمن عبر البوت إذا وجدت
+        // استقبال الجوائز المعدلة من لوحة الأدمن عبر الرابط وفك التشفير بدقة 100%
         if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
                 try {
                     let decodedString = decodeURIComponent(prizesParam);
-                    if (decodedString.includes('%')) {
-                        decodedString = decodeURIComponent(decodedString);
+                    // فك التشفير المتكرر في حال مرور النص بعِدة طبقات تشفير عبر الـ URL
+                    if (decodedString.includes('%') || decodedString.includes('+')) {
+                        try {
+                            decodedString = decodeURIComponent(decodedString.replace(/\+/g, ' '));
+                        } catch(err) {}
                     }
+                    
                     let decodedPrizes = decodedString.split(',');
                     if (decodedPrizes.length > 0) {
-                        sectors = decodedPrizes.map((p, i) => ({
-                            text: p.trim(),
-                            color: i % 2 === 0 ? "#166946" : "#222a35",
-                            textColor: "#fff"
-                        }));
+                        sectors = decodedPrizes.map((p, i) => {
+                            let cleanText = p.trim();
+                            let tColor = "#fff";
+                            if (cleanText.includes("بونص")) tColor = "#ffd700";
+                            else if (cleanText.includes("حظ") || cleanText.includes("اوفر")) tColor = "#ff5252";
+                            
+                            return {
+                                text: cleanText,
+                                color: i % 2 === 0 ? "#166946" : "#222a35",
+                                textColor: tColor
+                            };
+                        });
                     }
                 } catch(e) {
                     console.log("Error parsing prizes:", e);
@@ -245,7 +250,6 @@
             sectors.forEach((sector, i) => {
                 const angle = i * arc - Math.PI / 2;
                 
-                // رسم قطاع العجلة
                 ctx.beginPath();
                 ctx.fillStyle = sector.color;
                 ctx.moveTo(centerX, centerY);
@@ -253,22 +257,17 @@
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
 
-                // خط فاصل بين الأقسام بلون فضي خفيف
                 ctx.strokeStyle = "#2c3e35";
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // رسم النص والرموز داخل القسم
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = sector.textColor;
-                ctx.font = "bold 24px Tahoma";
-                
-                // إزاحة النص للداخل قليلاً ليتسق مع التصميم
-                ctx.fillText(sector.text, radius - 60, 10);
-                
+                ctx.font = "bold 22px Tahoma";
+                ctx.fillText(sector.text, radius - 55, 10);
                 ctx.restore();
             });
         }
@@ -306,7 +305,6 @@
                             tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
                         } catch(e) {}
 
-                        // إرسال البيانات حصراً للبوت عبر tg.sendData ثم إغلاق نافذة الـ WebApp
                         setTimeout(() => {
                             try {
                                 tg.sendData(userId + "|" + winningPrize);
