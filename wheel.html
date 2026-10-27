@@ -11,11 +11,11 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body {
+       body {
             background-color: #0b1e16;
             background-image: 
                 radial-gradient(circle at center, rgba(16, 53, 38, 0.8) 0%, rgba(4, 15, 11, 0.95) 100%),
-                url('background.jpg'); /* تم ربطها بالصورة الخلفية */
+                url('background.jpg'); 
             background-size: cover;
             background-position: center;
             color: #fff;
@@ -30,7 +30,6 @@
             min-height: 100vh;
             overflow: hidden;
         }
-
         .header-container {
             display: flex;
             align-items: center;
@@ -95,11 +94,12 @@
             transform: translate(-50%, -50%);
             width: 82px;
             height: 82px;
-            background: url('center_logo.jpg') center/cover no-repeat; /* الدائرة المنتصف للصورة المرفقة */
+            background: url('spin-center.png') center/cover no-repeat; /* تم ضبط اسم صورة الدائرة بالمنتصف */
+            background-color: #1a232a; /* كخلفية احتياطية في حال لم تظهر الصورة */
             color: #fff;
             border: 4px solid #d4af37;
             border-radius: 50%;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
             z-index: 50;
@@ -180,11 +180,11 @@
             { text: "10000", color: "#222a35", textColor: "#fff" }
         ];
 
-        if (urlParams.has('prizes')) {
+       if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
                 try {
-                    let decodedString = decodeURIComponent(prizesParam);
+                    let decodedString = decodeURIComponent(prizesParam.replace(/\+/g, ' '));
                     let decodedPrizes = decodedString.split(',');
                     if (decodedPrizes.length > 0) {
                         sectors = decodedPrizes.map((p, i) => {
@@ -201,7 +201,9 @@
                             };
                         });
                     }
-                } catch(e) {}
+                } catch(e) {
+                    console.log("Error parsing prizes:", e);
+                }
             }
         }
 
