@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الفرصة</title>
+    <title>عجلة الفرصة - Ralph Bot</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -15,7 +15,9 @@
             background-color: #0b1e16;
             background-image: 
                 radial-gradient(circle at center, rgba(16, 53, 38, 0.8) 0%, rgba(4, 15, 11, 0.95) 100%),
-                repeating-radial-gradient(circle at 0 0, transparent 0, rgba(0,0,0,0.4) 40px);
+                url('background.jpg'); /* تم ربطها بالصورة الخلفية */
+            background-size: cover;
+            background-position: center;
             color: #fff;
             text-align: center;
             font-family: Tahoma, sans-serif;
@@ -67,19 +69,6 @@
             z-index: 60;
             filter: drop-shadow(0 3px 3px rgba(0,0,0,0.7));
         }
-        
-        .pointer::after {
-            content: '';
-            position: absolute;
-            top: -28px;
-            left: -10px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 20px solid #e8e8e8;
-            z-index: 61;
-        }
 
         #wheelWrapper {
             width: 320px;
@@ -106,11 +95,11 @@
             transform: translate(-50%, -50%);
             width: 82px;
             height: 82px;
-            background: linear-gradient(145deg, #d8e0e6 0%, #9aa3ab 100%);
-            color: #1a232a;
-            border: 4px solid #ffffff;
+            background: url('center_logo.jpg') center/cover no-repeat; /* الدائرة المنتصف للصورة المرفقة */
+            color: #fff;
+            border: 4px solid #d4af37;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             z-index: 50;
@@ -118,6 +107,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
             transition: transform 0.2s;
         }
 
@@ -145,22 +135,17 @@
         .condition-text {
             font-size: 13px;
             color: #c5c5c5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .condition-text span {
-            color: #00ffcc;
         }
     </style>
 </head>
 <body>
 
+    <!-- مشغل الصوت (الأغنية) -->
+    <audio id="spinAudio" src="wheel_sound.mp3" preload="auto"></audio>
+
     <div class="header-container">
         <span style="font-size: 20px;">🎡</span>
-        <div class="header-title">عجلة الفرصة</div>
+        <div class="header-title">عجلة الفرصة - Wionbet</div>
     </div>
 
     <div class="wheel-container">
@@ -172,10 +157,8 @@
     </div>
 
     <div class="footer-card">
-        <div class="spins-left">التدويرات المتبقية: <span id="spinsCount">1</span></div>
-        <div class="condition-text">
-            💳 تدوير عجلة الحظ المتاحة بحسب رصيدك وعملياتك
-        </div>
+        <div class="spins-left">الحالة: <span id="statusText">جاهز للتدوير</span></div>
+        <div class="condition-text">🎁 اربح مبالغ نقدية، بونص مئوي، أو لفات إضافية!</div>
     </div>
 
     <script>
@@ -185,38 +168,31 @@
         const urlParams = new URLSearchParams(window.location.search);
         const preDeterminedPrize = urlParams.get('prize') ? decodeURIComponent(urlParams.get('prize')).trim() : null;
         const userId = urlParams.get('uid') || "0";
+        const audio = document.getElementById("spinAudio");
 
         // الجوائز الافتراضية
         let sectors = [
             { text: "1000", color: "#166946", textColor: "#fff" },
-            { text: "2000", color: "#222a35", textColor: "#fff" },
-            { text: "3000", color: "#166946", textColor: "#fff" },
             { text: "5000", color: "#222a35", textColor: "#fff" },
-            { text: "15% بونص", color: "#166946", textColor: "#ffd700" },
-            { text: "10% بونص", color: "#222a35", textColor: "#ffd700" },
-            { text: "حظ أوفراً", color: "#166946", textColor: "#ff5252" }
+            { text: "3% بونص", color: "#166946", textColor: "#ffd700" },
+            { text: "حظ أوفر", color: "#222a35", textColor: "#ff5252" },
+            { text: "إعادة تدوير", color: "#166946", textColor: "#00ffcc" },
+            { text: "10000", color: "#222a35", textColor: "#fff" }
         ];
 
-        // استقبال الجوائز المعدلة من لوحة الأدمن عبر الرابط وفك التشفير بدقة 100%
         if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
                 try {
                     let decodedString = decodeURIComponent(prizesParam);
-                    // فك التشفير المتكرر في حال مرور النص بعِدة طبقات تشفير عبر الـ URL
-                    if (decodedString.includes('%') || decodedString.includes('+')) {
-                        try {
-                            decodedString = decodeURIComponent(decodedString.replace(/\+/g, ' '));
-                        } catch(err) {}
-                    }
-                    
                     let decodedPrizes = decodedString.split(',');
                     if (decodedPrizes.length > 0) {
                         sectors = decodedPrizes.map((p, i) => {
                             let cleanText = p.trim();
                             let tColor = "#fff";
-                            if (cleanText.includes("بونص")) tColor = "#ffd700";
+                            if (cleanText.includes("بونص") || cleanText.includes("%")) tColor = "#ffd700";
                             else if (cleanText.includes("حظ") || cleanText.includes("اوفر")) tColor = "#ff5252";
+                            else if (cleanText.includes("إعادة") || cleanText.includes("تدوير")) tColor = "#00ffcc";
                             
                             return {
                                 text: cleanText,
@@ -225,9 +201,7 @@
                             };
                         });
                     }
-                } catch(e) {
-                    console.log("Error parsing prizes:", e);
-                }
+                } catch(e) {}
             }
         }
 
@@ -266,8 +240,8 @@
                 ctx.rotate(angle + arc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = sector.textColor;
-                ctx.font = "bold 22px Tahoma";
-                ctx.fillText(sector.text, radius - 55, 10);
+                ctx.font = "bold 20px Tahoma";
+                ctx.fillText(sector.text, radius - 45, 10);
                 ctx.restore();
             });
         }
@@ -279,6 +253,12 @@
             if (isSpinning) return;
             isSpinning = true;
             spinBtn.classList.add("disabled");
+
+            // تشغيل الأغنية أو المقطع الصوتي أثناء الدوران
+            try {
+                audio.currentTime = 0;
+                audio.play();
+            } catch(e) {}
 
             let winningIndex = 0;
             if (preDeterminedPrize) {
@@ -305,17 +285,10 @@
                             tg.showAlert(`🎉 مبروك! لقد فزت بـ: (${winningPrize})`);
                         } catch(e) {}
 
-                        setTimeout(() => {
-                            try {
-                                tg.sendData(userId + "|" + winningPrize);
-                            } catch(e) {
-                                console.log("Send data error:", e);
-                            }
-                            
-                            try {
-                                tg.close();
-                            } catch(e) {}
-                        }, 1200);
+                        // إرسال النتيجة للبوت عبر sendData دون إغلاق العجلة تلقائياً لكي يتركها المستخدم لنفسه
+                        try {
+                            tg.sendData(userId + "|" + winningPrize);
+                        } catch(e) {}
                     }
                 });
             }
