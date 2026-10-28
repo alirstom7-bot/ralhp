@@ -170,17 +170,17 @@
         const userId = urlParams.get('uid') || "0";
         const audio = document.getElementById("spinAudio");
 
-        // الجوائز الافتراضية
+      // القيم الافتراضية الكاحتياطية فقط في حال لم يمرر الرابط أي شيء
         let sectors = [
             { text: "1000", color: "#166946", textColor: "#fff" },
-            { text: "5000", color: "#222a35", textColor: "#fff" },
+            { text: "2000", color: "#222a35", textColor: "#fff" },
             { text: "3% بونص", color: "#166946", textColor: "#ffd700" },
             { text: "حظ أوفر", color: "#222a35", textColor: "#ff5252" },
-            { text: "إعادة تدوير", color: "#166946", textColor: "#00ffcc" },
-            { text: "10000", color: "#222a35", textColor: "#fff" }
+            { text: "إعادة تدوير", color: "#166946", textColor: "#00ffcc" }
         ];
 
-       if (urlParams.has('prizes')) {
+        // استقبال الجوائز القادمة من البوت وقاعدة البيانات عبر الرابط وتحديث العجلة فوراً
+        if (urlParams.has('prizes')) {
             let prizesParam = urlParams.get('prizes');
             if (prizesParam) {
                 try {
@@ -202,7 +202,7 @@
                         });
                     }
                 } catch(e) {
-                    console.log("Error parsing prizes:", e);
+                    console.log("Error parsing prizes from URL:", e);
                 }
             }
         }
