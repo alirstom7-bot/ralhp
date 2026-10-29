@@ -171,7 +171,8 @@
         let preDeterminedPrize = null;
         if (urlParams.has('prize')) {
             try {
-                preDeterminedPrize = decodeURIComponent(urlParams.get('prize').replace(/\+/g, ' ')).trim();
+                // إرجاع كلمة "بالمئة" إلى الرمز الأساسي "%" إذا وجدت في الجائزة المحددة
+                preDeterminedPrize = decodeURIComponent(urlParams.get('prize').replace(/\+/g, ' ')).trim().replace(/بالمئة/g, "%");
             } catch(e) {
                 preDeterminedPrize = urlParams.get('prize');
             }
@@ -192,7 +193,8 @@
                     
                     if (decodedPrizes && decodedPrizes.length > 0) {
                         sectors = decodedPrizes.map((p, i) => {
-                            let cleanText = p.trim();
+                            // إعادة تحويل كلمة "بالمئة" إلى رمز النسبة المئوية "%" الحقيقي
+                            let cleanText = p.trim().replace(/بالمئة/g, "%");
                             let tColor = "#fff";
                             
                             if (cleanText.includes("بونص") || cleanText.includes("%")) tColor = "#ffd700";
