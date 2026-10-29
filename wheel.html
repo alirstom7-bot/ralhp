@@ -171,7 +171,6 @@
         let preDeterminedPrize = null;
         if (urlParams.has('prize')) {
             try {
-                // إرجاع كلمة "بالمئة" إلى الرمز الأساسي "%" إذا وجدت في الجائزة المحددة
                 preDeterminedPrize = decodeURIComponent(urlParams.get('prize').replace(/\+/g, ' ')).trim().replace(/بالمئة/g, "%");
             } catch(e) {
                 preDeterminedPrize = urlParams.get('prize');
@@ -181,7 +180,6 @@
         const userId = urlParams.get('uid') || "0";
         const audio = document.getElementById("spinAudio");
 
-        // مصفوفة فارغة لضمان استقبال الجوائز المحدثة من لوحة الأدمن بدقة
         let sectors = [];
 
         if (urlParams.has('prizes')) {
@@ -193,7 +191,6 @@
                     
                     if (decodedPrizes && decodedPrizes.length > 0) {
                         sectors = decodedPrizes.map((p, i) => {
-                            // إعادة تحويل كلمة "بالمئة" إلى رمز النسبة المئوية "%" الحقيقي
                             let cleanText = p.trim().replace(/بالمئة/g, "%");
                             let tColor = "#fff";
                             
@@ -214,7 +211,6 @@
             }
         }
 
-        // قيم احتياطية في حال لم يتم إرسال الرابط بشكل صحيح
         if (!sectors || sectors.length === 0) {
             sectors = [
                 { text: "1000", color: "#166946", textColor: "#fff" },
@@ -302,16 +298,17 @@
                         
                         try {
                             tg.showAlert(winMessage, () => {
-                                // استبدل YOUR_BOT_USERNAME بمعرف بوتك الحقيقي بدون علامة @
-                                window.location.href = `https://t.me/8628671662:AAHRSp567Cmav2Zg4U2GfHjDCQUVevGPDIQ?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                                // استبدل YOUR_BOT_USERNAME بمعرف بوتك الحقيقي (مثال: ralph_bot) بدون علامة @
+                                window.location.href = `https://t.me/YOUR_BOT_USERNAME?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                             });
                         } catch(e) {
                             alert(winMessage);
-                            window.location.href = `https://t.me/8628671662:AAHRSp567Cmav2Zg4U2GfHjDCQUVevGPDIQ?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                            window.location.href = `https://t.me/YOUR_BOT_USERNAME?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                         }
                     }
                 });
             }
+        }
     </script>
 </body>
 </html>
