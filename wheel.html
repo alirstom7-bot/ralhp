@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الفرصة - Ralph Bot</title>
+    <title>عجلة الفرصة - Wionbet</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -141,7 +141,6 @@
 </head>
 <body>
 
-    <!-- مشغل الصوت -->
     <audio id="spinAudio" src="wheel_sound.mp3" preload="auto"></audio>
 
     <div class="header-container">
@@ -158,8 +157,8 @@
     </div>
 
     <div class="footer-card">
-        <div class="spins-left">الحالة: <span id="statusText">جاهز للتدوير</span></div>
-        <div class="condition-text">🎁 اربح مبالغ نقدية، بونص مئوي، أو لفات إضافية!</div>
+        <div class="spins-left">اللفات المتاحة: <span id="spinsCountText">جاري التحميل...</span></div>
+        <div class="condition-text" id="conditionDesc">🎁 اربح مبالغ نقدية، بونص مئوي، أو لفات إضافية!</div>
     </div>
 
     <script>
@@ -178,8 +177,12 @@
         }
 
         const userId = urlParams.get('uid') || "0";
-        const audio = document.getElementById("spinAudio");
+        const spinsLeftParam = urlParams.get('spins') || "1";
+        
+        // عرض عدد اللفات المتاحة في البطاقة السفلية
+        document.getElementById("spinsCountText").innerText = spinsLeftParam;
 
+        const audio = document.getElementById("spinAudio");
         let sectors = [];
 
         if (urlParams.has('prizes')) {
@@ -293,17 +296,43 @@
                     ease: "power3.out",
                     onComplete: () => {
                         isSpinning = false;
-                        
-                        let winMessage = `🎉 مبروك! لقد فزت بـ: (${winningPrize})\n\nاضغط موافق لاستلام جائزتك فوراً عبر البوت.`;
-                        
+
+                        // 1. حالة حظ أوفر (عرض رسالة مع زر Close فقط مع البقاء داخل العجلة)
+                        if (winningPrize.includes("حظ") || winningPrize.includes("أوفر") || winningPrize.includes("خاسر")) {
+                            try {
+                                tg.showAlert(`❌ عذراً، حظ أوفر في المرات القادمة!`, () => {
+                                    spinBtn.classList.remove("disabled");
+                                });
+                            } catch(e) {
+                                alert("❌ عذراً، حظ أوفر في المرات القادمة!");
+                                spinBtn.classList.remove("disabled");
+                            }
+                            return;
+                        }
+
+                        // 2. حالة إعادة تدوير / لفة إضافية (تغلق وحدها ويتم تفعيل اللفة فوراً داخل العجلة)
+                        if (winningPrize.includes("إعادة") || winningPrize.includes("تدوير")) {
+                            try {
+                                tg.sendData(userId + "|" + winningPrize);
+                                tg.showAlert(`🔄 مبروك! لقد ربحت لفة إضافية مجانية!`, () => {
+                                    spinBtn.classList.remove("disabled");
+                                });
+                            } catch(e) {
+                                alert("🔄 مبروك! لقد ربحت لفة إضافية مجانية!");
+                                spinBtn.classList.remove("disabled");
+                            }
+                            return;
+                        }
+
+                        // 3. بقية الجوائز (مبالغ نقدية أو بونص مئوي) -> الانتقال للبوت لاستلامها
+                        let winMessage = `🎉 مبروك! لقد فزت بـ: (${winningPrize})\n\nاضغط Close ثم انتقل للبوت لاستلام جائزتك فوراً.`;
                         try {
                             tg.showAlert(winMessage, () => {
-                                // استبدل YOUR_BOT_USERNAME بمعرف بوتك الحقيقي (مثال: ralph_bot) بدون علامة @
-                                window.location.href = `https://t.me/RALPH_WION_BOT?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                                window.location.href = `https://t.me/YOUR_BOT_USERNAME?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                             });
                         } catch(e) {
                             alert(winMessage);
-                            window.location.href = `https://t.me/RALPH_WION_BOT?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                            window.location.href = `https://t.me/YOUR_BOT_USERNAME?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                         }
                     }
                 });
