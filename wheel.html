@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الفرصة - Wionbet</title>
+    <title>عجلة الفرصة -pikatchu</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -145,7 +145,7 @@
 
     <div class="header-container">
         <span style="font-size: 20px;">🎡</span>
-        <div class="header-title">عجلة الفرصة - Wionbet</div>
+        <div class="header-title">عجلة الفرصة - pikatchu</div>
     </div>
 
     <div class="wheel-container">
@@ -328,11 +328,11 @@
                         let winMessage = `🎉 مبروك! لقد فزت بـ: (${winningPrize})\n\nاضغط Close ثم انتقل للبوت لاستلام جائزتك فوراً.`;
                         try {
                             tg.showAlert(winMessage, () => {
-                                window.location.href = `https://t.me/YOUR_BOT_USERNAME?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                                window.location.href = `https://t.me/Wionbet_Pikatchu_bot?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                             });
                         } catch(e) {
                             alert(winMessage);
-                            window.location.href = `https://t.me/YOUR_BOT_USERNAME?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                            window.location.href = `https://t.me/Wionbet_Pikatchu_bot?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                         }
                     }
                 });
