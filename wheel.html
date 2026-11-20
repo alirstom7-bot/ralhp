@@ -328,11 +328,11 @@
                         let winMessage = `🎉 مبروك! لقد فزت بـ: (${winningPrize})\n\nاضغط Close ثم انتقل للبوت لاستلام جائزتك فوراً.`;
                         try {
                             tg.showAlert(winMessage, () => {
-                                window.location.href = `https://t.me/Wionbet_Pikatchu_bot?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                                window.location.href = `https://t.me/RALHP_ICHANCY_BOT?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                             });
                         } catch(e) {
                             alert(winMessage);
-                            window.location.href = `https://t.me/Wionbet_Pikatchu_bot?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
+                            window.location.href = `https://t.me/RALHP_ICHANCY_BOT?start=wheel_${userId}_${encodeURIComponent(winningPrize)}`;
                         }
                     }
                 });
